@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "MyBrand Italia — Nuova collezione multibrand" },
       {
         property: "og:description",
-        content: "Selezione curata dei brand di tendenza per tutta la famiglia.",
+        content: "Scopri Donna, Uomo, Bambino e Accessori dai brand di tendenza. Spedizione e reso gratuiti, paga in 3 rate.",
       },
     ],
   }),
