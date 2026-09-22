@@ -40,14 +40,17 @@ export function FilterSections({
   facets,
   value,
   onChange,
-  defaultOpen = "brand",
+  defaultOpen = "all",
+  desktopGrid = false,
 }: {
   facets: Facets;
   value: PlpSearch;
   onChange: (patch: Partial<PlpSearch>) => void;
   defaultOpen?: string;
+  desktopGrid?: boolean;
 }) {
-  const [open, setOpen] = useState<string | null>(defaultOpen);
+  const sectionIds = ["cat", "brand", "size", "color", "price", "promo"];
+  const [openSections, setOpenSections] = useState<string[]>(defaultOpen === "all" ? sectionIds : [defaultOpen]);
   const [brandQuery, setBrandQuery] = useState("");
   const [showAllBrands, setShowAllBrands] = useState(false);
 
@@ -62,22 +65,25 @@ export function FilterSections({
   );
   const visibleBrands = showAllBrands || brandQuery ? brandList : brandList.slice(0, 6);
 
-  const Section = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => (
-    <div className="border-b border-border">
+  const Section = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => {
+    const isOpen = openSections.includes(id);
+    return (
+    <div className={desktopGrid ? "min-w-0 border-r border-border px-4 last:border-r-0" : "border-b border-border"}>
       <button
-        onClick={() => setOpen(open === id ? null : id)}
-        aria-expanded={open === id}
-        className="flex h-14 w-full items-center justify-between px-4 text-sm font-medium"
+        onClick={() => setOpenSections((current) => isOpen ? current.filter((item) => item !== id) : [...current, id])}
+        aria-expanded={isOpen}
+        className={`flex h-14 w-full items-center justify-between text-sm font-semibold ${desktopGrid ? "px-0" : "px-4"}`}
       >
         {label}
-        <ChevronDown className={`h-4 w-4 transition-transform ${open === id ? "rotate-180" : ""}`} strokeWidth={1.5} />
+        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} strokeWidth={1.5} />
       </button>
-      {open === id && <div className="px-4 pb-5">{children}</div>}
+      {isOpen && <div className={desktopGrid ? "pb-5" : "px-4 pb-5"}>{children}</div>}
     </div>
-  );
+    );
+  };
 
   return (
-    <div>
+    <div className={desktopGrid ? "grid grid-cols-3 xl:grid-cols-6" : ""}>
       {facets.categories.length > 1 && (
         <Section id="cat" label="Categoria">
           <div className="flex flex-wrap gap-2">

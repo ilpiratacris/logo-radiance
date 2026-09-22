@@ -1,7 +1,7 @@
 import { SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ProductGrid } from "@/components/site/ProductGrid";
-import { FilterDrawer } from "@/components/site/FilterDrawer";
+import { FilterDrawer, FilterSections } from "@/components/site/FilterDrawer";
 import { SortSheet } from "@/components/site/SortSheet";
 import {
   activeChips,
@@ -46,7 +46,7 @@ export function CatalogListing({
         <div className="container-mb flex h-12 items-center gap-2">
           <button
             onClick={() => setFiltersOpen(true)}
-            className="flex h-10 flex-1 items-center justify-center gap-2 border border-border-strong text-sm font-medium lg:flex-none lg:px-5"
+            className="flex h-10 flex-1 items-center justify-center gap-2 border border-border-strong text-sm font-medium lg:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
             Filtri{nActive > 0 ? ` (${nActive})` : ""}
@@ -83,7 +83,24 @@ export function CatalogListing({
         )}
       </div>
 
-      <div className="container-mb py-6">
+      <section className="container-mb hidden py-5 lg:block" aria-label="Filtri prodotti">
+        <div className="border border-border bg-surface">
+          <div className="flex items-center justify-between border-b border-border px-4">
+            <div className="flex h-12 items-center gap-2 text-sm font-semibold">
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
+              Filtra i prodotti{nActive > 0 ? ` (${nActive})` : ""}
+            </div>
+            {nActive > 0 && (
+              <button onClick={onClear} className="h-11 text-xs font-medium underline underline-offset-4">
+                Rimuovi tutti
+              </button>
+            )}
+          </div>
+          <FilterSections facets={facets} value={value} onChange={onChange} defaultOpen="all" desktopGrid />
+        </div>
+      </section>
+
+      <div className="container-mb py-4 lg:pt-1">
         <div className="min-w-0">
           <div className="mb-3 text-xs text-muted-foreground lg:hidden">{results.length} prodotti</div>
           {results.length === 0 ? (

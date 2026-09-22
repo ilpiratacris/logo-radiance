@@ -173,7 +173,7 @@ function DepartmentHome() {
 
       {dep === "donna" && (
         <>
-          <section className="py-8 md:py-12">
+          <section className="bg-surface py-8 md:py-12">
             <div className="container-mb">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Ispirazione donna</p>
               <h2 className="mt-1 text-xl font-semibold md:text-3xl">Costruisci il tuo look</h2>
@@ -187,7 +187,7 @@ function DepartmentHome() {
               </div>
             </div>
           </section>
-          <ProductCarousel eyebrow="Nuova stagione" title="Novità Donna" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} />
+          <div className="bg-background"><ProductCarousel eyebrow="Nuova stagione" title="Novità Donna" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
           <section className="bg-foreground py-10 text-background md:py-14">
             <div className="container-mb grid items-center gap-6 md:grid-cols-[1.25fr_.75fr]">
               <img src={editorialImage} alt="Ispirazione outfit donna" width={1600} height={1000} loading="lazy" className="aspect-[4/3] w-full object-contain" />
@@ -195,14 +195,15 @@ function DepartmentHome() {
             </div>
           </section>
           <BrandCarousel />
-          <ProductCarousel eyebrow="Scelti da voi" title="Best seller Donna" products={pick(bestSellers())} />
+          <div className="bg-surface"><ProductCarousel eyebrow="Scelti da voi" title="Best seller Donna" products={pick(bestSellers())} /></div>
           {promoBlock}
         </>
       )}
 
       {dep === "uomo" && (
         <>
-          <section className="container-mb py-9 md:py-14">
+          <section className="bg-surface py-9 md:py-14">
+            <div className="container-mb">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Trova subito quello che cerchi</p>
             <h2 className="mt-1 text-xl font-semibold md:text-3xl">Categorie Uomo</h2>
             <div className="mt-5 grid gap-px bg-border md:grid-cols-3">
@@ -214,13 +215,13 @@ function DepartmentHome() {
                   </div>
                 </div>
               ))}
-            </div>
+            </div></div>
           </section>
-          <ProductCarousel eyebrow="I più scelti" title="Best seller Uomo" products={pick(bestSellers())} to="/categoria/$slug" toParams={{ slug: dep }} />
+          <div className="bg-background"><ProductCarousel eyebrow="I più scelti" title="Best seller Uomo" products={pick(bestSellers())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
           <BrandCarousel />
-          <ProductCarousel eyebrow="Appena arrivati" title="Novità Uomo" products={pick(newArrivals())} />
+          <div className="bg-surface"><ProductCarousel eyebrow="Appena arrivati" title="Novità Uomo" products={pick(newArrivals())} /></div>
           {promoBlock}
-          <ProductCarousel eyebrow="Occasioni" title="Prezzi ridotti Uomo" products={pick(promoProducts())} />
+          <div className="bg-surface"><ProductCarousel eyebrow="Occasioni" title="Prezzi ridotti Uomo" products={pick(promoProducts())} /></div>
         </>
       )}
 
@@ -240,11 +241,11 @@ function DepartmentHome() {
               </div>
             </div>
           </section>
-          <ProductCarousel eyebrow="Per i più piccoli" title="Novità Bambino" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} />
-          <section className="container-mb py-8 md:py-12">
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
+          <div className="bg-background"><ProductCarousel eyebrow="Per i più piccoli" title="Novità Bambino" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
+          <section className="bg-foreground py-8 text-background md:py-12">
+            <div className="container-mb grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
               {shopByCategory.map((category) => (
-                <Link key={category.slug} to="/categoria/$slug" params={{ slug: dep }} search={{ cat: category.slug }} className="border border-border p-3">
+                <Link key={category.slug} to="/categoria/$slug" params={{ slug: dep }} search={{ cat: category.slug }} className="bg-background p-3 text-foreground">
                   <img src={categoryImage(category.slug)} alt={category.label} width={600} height={600} loading="lazy" className="aspect-square w-full object-contain" />
                   <span className="mt-2 block text-sm font-semibold">{category.label}</span>
                 </Link>
@@ -252,7 +253,7 @@ function DepartmentHome() {
             </div>
           </section>
           {promoBlock}
-          <ProductCarousel eyebrow="Sempre utili" title="I più scelti per Bambino" products={pick(bestSellers())} />
+          <div className="bg-surface"><ProductCarousel eyebrow="Sempre utili" title="I più scelti per Bambino" products={pick(bestSellers())} /></div>
           <BrandCarousel />
         </>
       )}
