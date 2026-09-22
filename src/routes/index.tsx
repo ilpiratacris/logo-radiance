@@ -102,7 +102,8 @@ function Home() {
       </section>
 
       {/* ACCESSO RAPIDO AI REPARTI */}
-      <section className="container-mb py-6">
+      <section className="bg-surface py-6">
+        <div className="container-mb">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           {departments.map((d) => (
             <Link key={d.slug} to="/reparto/$slug" params={{ slug: d.slug }} className="group block">
@@ -120,20 +121,20 @@ function Home() {
               </div>
             </Link>
           ))}
-        </div>
+        </div></div>
       </section>
 
       {/* NOVITÀ */}
-      <ProductCarousel
+      <div className="bg-background"><ProductCarousel
         eyebrow="Appena arrivati"
         title={`Novità ${depLabel}`}
         products={news}
         to="/categoria/$slug"
         toParams={{ slug: dep }}
-      />
+      /></div>
 
       {/* SHOP BY CATEGORY */}
-      <section className="py-8 md:py-12">
+      <section className="bg-surface py-8 md:py-12">
         <div className="container-mb">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Scopri per categoria
@@ -172,13 +173,13 @@ function Home() {
       <BrandCarousel />
 
       {/* BEST SELLER */}
-      <ProductCarousel
+      <div className="bg-background"><ProductCarousel
         eyebrow="I più amati"
         title="Best seller"
         products={best}
         to="/categoria/$slug"
         toParams={{ slug: dep }}
-      />
+      /></div>
 
       {/* PROMO ATTIVA */}
       <section className="container-mb py-8 md:py-12">
@@ -206,7 +207,7 @@ function Home() {
         </Link>
       </section>
 
-      <ProductCarousel eyebrow="In promozione" title="Prezzi ridotti" products={promoList} />
+      <div className="bg-surface"><ProductCarousel eyebrow="In promozione" title="Prezzi ridotti" products={promoList} /></div>
 
       {/* EDITORIALE */}
       <section className="bg-foreground py-10 md:py-14">
