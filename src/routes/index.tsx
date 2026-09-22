@@ -37,17 +37,10 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const CAT_IMAGES: Record<DepartmentSlug, string> = {
-  donna: "",
-  uomo: "",
-  bambino: "",
-};
-
 function Home() {
   const { department, hydrated } = useStore();
   const dep: DepartmentSlug = hydrated ? department : "donna";
   const depLabel = departments.find((d) => d.slug === dep)!.label;
-  void CAT_IMAGES;
 
   const hero = campaigns[0]!;
   const promo = campaigns[1]!;
