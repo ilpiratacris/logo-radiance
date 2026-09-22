@@ -1,195 +1,251 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { TopBar } from "@/components/site/TopBar";
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
-import { ProductCard } from "@/components/site/ProductCard";
-import { TrustBar } from "@/components/site/TrustBar";
-import { products, brands } from "@/lib/mock-data";
-import hero from "@/assets/hero-woman.jpg";
-import donna from "@/assets/cat-donna.jpg";
-import uomo from "@/assets/cat-uomo.jpg";
-import bambino from "@/assets/cat-bambino.jpg";
 import { ArrowRight } from "lucide-react";
+import { SiteLayout } from "@/components/site/SiteLayout";
+import { ProductCarousel } from "@/components/site/ProductCarousel";
+import { BrandCarousel } from "@/components/site/BrandCarousel";
+import { RecentlyViewed } from "@/components/site/RecentlyViewed";
+import { TrustBar } from "@/components/site/TrustBar";
+import {
+  bestSellers,
+  campaigns,
+  departments,
+  editorialImage,
+  navTree,
+  newArrivals,
+  productsByDepartment,
+  promoProducts,
+  type DepartmentSlug,
+} from "@/lib/catalog";
+import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "MyBrand Italia — Nuova collezione multibrand" },
-      {
-        name: "description",
-        content:
-          "Scopri Donna, Uomo, Bambino e Accessori dai brand di tendenza. Spedizione e reso gratuiti, paga in 3 rate.",
-      },
-      { property: "og:title", content: "MyBrand Italia — Nuova collezione multibrand" },
-      {
-        property: "og:description",
-        content: "Scopri Donna, Uomo, Bambino e Accessori dai brand di tendenza. Spedizione e reso gratuiti, paga in 3 rate.",
-      },
-    ],
-  }),
+  head: () => {
+    const title = "MyBrand Italia — moda multibrand donna, uomo e bambino";
+    const description =
+      "Novità, promozioni e i migliori brand fashion: Peuterey, EA7, The North Face, K-Way, Liu Jo e molti altri. Spedizione tracciata in tutta Italia.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+    };
+  },
   component: Home,
 });
 
+const CAT_IMAGES: Record<DepartmentSlug, string> = {
+  donna: "",
+  uomo: "",
+  bambino: "",
+};
+
 function Home() {
-  const novita = products.slice(0, 4);
-  const offerte = products.filter((p) => p.oldPrice).slice(0, 4);
+  const { department, hydrated } = useStore();
+  const dep: DepartmentSlug = hydrated ? department : "donna";
+  const depLabel = departments.find((d) => d.slug === dep)!.label;
+  void CAT_IMAGES;
+
+  const hero = campaigns[0]!;
+  const promo = campaigns[1]!;
+
+  const depProducts = productsByDepartment(dep);
+  const news = [...newArrivals().filter((p) => p.department === dep), ...newArrivals()].slice(0, 10);
+  const best = [...bestSellers().filter((p) => p.department === dep), ...bestSellers()].slice(0, 10);
+  const promoList = [...promoProducts().filter((p) => p.department === dep), ...promoProducts()].slice(0, 10);
+
+  const shopByCategory = navTree[dep][0]!.items.slice(0, 3)
+    .concat(navTree[dep][1]!.items.slice(0, 2))
+    .concat(navTree[dep][2]!.items.slice(0, 1));
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <TopBar />
-      <Header />
-
-      <main className="flex-1">
-        {/* HERO */}
-        <section className="relative bg-surface">
-          <div className="container-mb grid gap-8 py-10 md:grid-cols-2 md:items-center md:py-16 lg:py-20">
-            <div className="order-2 md:order-1">
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Nuova collezione
-              </div>
-              <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                I brand che ami,
-                <br />
-                selezionati per te.
-              </h1>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground">
-                Un'accurata selezione delle migliori marche di tendenza,
-                curata per tutta la famiglia.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/categoria/$slug" params={{ slug: "donna" }} className="btn-primary">
-                  Scopri Donna
-                </Link>
-                <Link to="/categoria/$slug" params={{ slug: "uomo" }} className="btn-outline">
-                  Scopri Uomo
-                </Link>
-              </div>
-            </div>
-            <div className="order-1 md:order-2">
-              <img
-                src={hero}
-                alt="Nuova collezione MyBrand"
-                width={1600}
-                height={1000}
-                className="w-full aspect-[4/5] md:aspect-[5/6] object-cover"
-                fetchPriority="high"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* CATEGORIE PRINCIPALI */}
-        <section className="container-mb py-14 md:py-20">
-          <SectionHeader eyebrow="Shop" title="Categorie principali" />
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
-            {[
-              { slug: "donna", label: "Donna", img: donna },
-              { slug: "uomo", label: "Uomo", img: uomo },
-              { slug: "bambino", label: "Bambino", img: bambino },
-            ].map((c) => (
-              <Link
-                key={c.slug}
-                to="/categoria/$slug"
-                params={{ slug: c.slug }}
-                className="group relative block overflow-hidden bg-surface"
-              >
-                <img
-                  src={c.img}
-                  alt={c.label}
-                  loading="lazy"
-                  width={800}
-                  height={1000}
-                  className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                />
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
-                  <span className="text-lg font-semibold text-background drop-shadow-md">
-                    {c.label}
-                  </span>
-                  <span className="inline-flex h-9 items-center gap-1.5 rounded-sm bg-background px-3 text-xs font-medium text-foreground">
-                    Scopri <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* BRAND */}
-        <section className="border-y border-border bg-surface">
-          <div className="container-mb py-12">
-            <SectionHeader eyebrow="Multibrand" title="Brand in evidenza" />
-            <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-5">
-              {brands.slice(0, 10).map((b) => (
-                <a
-                  key={b}
-                  href="#"
-                  className="flex h-20 items-center justify-center bg-background text-sm font-semibold tracking-tight text-foreground/80 transition-colors hover:text-foreground"
+    <SiteLayout>
+      {/* HERO */}
+      <section className="relative">
+        <picture>
+          {hero.imageMobile && <source media="(max-width: 767px)" srcSet={hero.imageMobile} />}
+          <img
+            src={hero.image}
+            alt={hero.headline}
+            width={1920}
+            height={1080}
+            // eslint-disable-next-line react/no-unknown-property
+            fetchPriority="high"
+            className="h-[60vh] w-full object-cover md:h-[62vh]"
+          />
+        </picture>
+        <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 via-foreground/20 to-transparent">
+          <div className="container-mb pb-8 md:pb-12">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-background/90">
+              {hero.label}
+            </span>
+            <h1 className="mt-2 max-w-xl text-3xl font-semibold leading-[1.05] tracking-tight text-background md:text-5xl">
+              {hero.headline}
+            </h1>
+            <p className="mt-2 max-w-sm text-sm text-background/85 md:text-base">{hero.copy}</p>
+            <div className="mt-5 flex gap-2">
+              {hero.cta.map((c) => (
+                <Link
+                  key={c.to}
+                  to="/categoria/$slug"
+                  params={{ slug: c.to }}
+                  search={{ novita: "1" }}
+                  className="flex h-12 flex-1 items-center justify-center bg-background px-6 text-sm font-semibold text-foreground md:flex-none"
                 >
-                  {b}
-                </a>
+                  {c.label}
+                </Link>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* NOVITÀ */}
-        <section className="container-mb py-14 md:py-20">
-          <div className="flex items-end justify-between">
-            <SectionHeader eyebrow="Appena arrivati" title="Novità della settimana" />
+      {/* ACCESSO RAPIDO AI REPARTI */}
+      <section className="container-mb py-6">
+        <div className="grid grid-cols-3 gap-2 md:gap-4">
+          {departments.map((d) => (
+            <Link key={d.slug} to="/categoria/$slug" params={{ slug: d.slug }} className="group block">
+              <img
+                src={d.image}
+                alt={d.label}
+                width={600}
+                height={750}
+                loading="lazy"
+                className="aspect-[4/5] w-full object-cover md:aspect-[3/4]"
+              />
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-sm font-semibold uppercase tracking-[0.08em]">{d.label}</span>
+                <ArrowRight className="h-4 w-4 opacity-60" strokeWidth={1.5} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* NOVITÀ */}
+      <ProductCarousel
+        eyebrow="Appena arrivati"
+        title={`Novità ${depLabel}`}
+        products={news}
+        to="/categoria/$slug"
+        toParams={{ slug: dep }}
+      />
+
+      {/* SHOP BY CATEGORY */}
+      <section className="py-8 md:py-12">
+        <div className="container-mb">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Scopri per categoria
+          </div>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight md:text-2xl">{depLabel}, reparto per reparto</h2>
+        </div>
+        <div className="container-mb mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
+          {shopByCategory.map((c, i) => {
+            const img = depProducts.find((p) => p.category === c.slug)?.variants[0]?.image ?? editorialImage;
+            return (
+              <Link
+                key={c.slug}
+                to="/categoria/$slug"
+                params={{ slug: dep }}
+                search={{ cat: c.slug }}
+                className="group relative overflow-hidden"
+              >
+                <img
+                  src={img}
+                  alt={c.label}
+                  width={600}
+                  height={600}
+                  loading={i < 2 ? "eager" : "lazy"}
+                  className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+                <span className="absolute bottom-0 left-0 m-2 bg-background px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.06em]">
+                  {c.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* BRAND */}
+      <BrandCarousel />
+
+      {/* BEST SELLER */}
+      <ProductCarousel
+        eyebrow="I più amati"
+        title="Best seller"
+        products={best}
+        to="/categoria/$slug"
+        toParams={{ slug: dep }}
+      />
+
+      {/* PROMO ATTIVA */}
+      <section className="container-mb py-8 md:py-12">
+        <Link to="/promo/$slug" params={{ slug: promo.slug }} className="group relative block overflow-hidden">
+          <img
+            src={promo.image}
+            alt={promo.headline}
+            width={1600}
+            height={900}
+            loading="lazy"
+            className="aspect-[4/5] w-full object-cover sm:aspect-[16/7]"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-foreground/75 to-transparent p-5 md:p-8">
+            <span className="inline-flex h-6 w-fit items-center bg-[color:var(--color-sale)] px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-background">
+              {promo.label}
+            </span>
+            <h2 className="mt-2 max-w-md text-2xl font-semibold tracking-tight text-background md:text-4xl">
+              {promo.headline}
+            </h2>
+            <p className="mt-1 max-w-md text-sm text-background/85">{promo.copy}</p>
+            <span className="mt-4 flex h-12 w-fit items-center bg-background px-6 text-sm font-semibold">
+              Scopri la promo
+            </span>
+          </div>
+        </Link>
+      </section>
+
+      <ProductCarousel eyebrow="In promozione" title="Prezzi ridotti" products={promoList} />
+
+      {/* EDITORIALE */}
+      <section className="bg-foreground py-10 md:py-14">
+        <div className="container-mb grid items-center gap-6 md:grid-cols-2">
+          <img
+            src={editorialImage}
+            alt="Ispirazione stagionale"
+            width={1600}
+            height={1000}
+            loading="lazy"
+            className="aspect-[4/3] w-full object-cover"
+          />
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-background/70">
+              Ispirazione
+            </div>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-background md:text-3xl">
+              Il layering dell'autunno
+            </h2>
+            <p className="mt-2 max-w-md text-sm text-background/80">
+              Giubbotti tecnici, maglieria e denim: come combinare i capi dei brand del momento. PLACEHOLDER:
+              contenuto editoriale gestito da backend.
+            </p>
             <Link
               to="/categoria/$slug"
-              params={{ slug: "donna" }}
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-accent"
+              params={{ slug: dep }}
+              search={{ cat: "giubbotti" }}
+              className="mt-5 inline-flex h-12 items-center bg-background px-6 text-sm font-semibold text-foreground"
             >
-              Vedi tutto <ArrowRight className="h-4 w-4" />
+              Scopri il look
             </Link>
           </div>
-          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
-            {novita.map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {/* OFFERTE */}
-        <section className="container-mb pb-14 md:pb-20">
-          <div className="flex items-end justify-between">
-            <SectionHeader eyebrow="Fino al −50%" title="Offerte in evidenza" />
-            <Link
-              to="/categoria/$slug"
-              params={{ slug: "offerte" }}
-              className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-accent"
-            >
-              Tutte le offerte <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
-            {offerte.map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
-          </div>
-        </section>
-
-        {/* Trust rinforzo */}
-        <section className="container-mb pb-16">
-          <TrustBar />
-        </section>
-      </main>
-
-      <Footer />
-    </div>
-  );
-}
-
-function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div>
-      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-        {eyebrow}
-      </div>
-      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-        {title}
-      </h2>
-    </div>
+      <RecentlyViewed />
+      <TrustBar />
+    </SiteLayout>
   );
 }
