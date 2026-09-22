@@ -20,26 +20,17 @@ export function BrandCarousel() {
         </Link>
       </div>
 
-      <div className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Brand in evidenza: solo tipografia, nessuna immagine da gestire */}
+      <div className="container-mb mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {featured.map((b) => (
           <Link
             key={b.slug}
             to="/brand/$slug"
             params={{ slug: b.slug }}
-            className="group relative w-[62%] shrink-0 snap-start overflow-hidden sm:w-[38%] lg:w-[23%]"
+            className="flex min-h-[88px] flex-col justify-center border border-border bg-background px-4 py-3 transition-colors hover:border-foreground"
           >
-            <img
-              src={b.image}
-              alt={b.name}
-              width={600}
-              height={400}
-              loading="lazy"
-              className="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/85 to-transparent p-3">
-              <div className="text-sm font-semibold uppercase tracking-[0.1em] text-background">{b.name}</div>
-              {b.claim && <div className="text-[11px] text-background/80">{b.claim}</div>}
-            </div>
+            <span className="text-sm font-semibold uppercase tracking-[0.16em]">{b.name}</span>
+            {b.claim && <span className="mt-1 text-[11px] text-muted-foreground">{b.claim}</span>}
           </Link>
         ))}
       </div>
