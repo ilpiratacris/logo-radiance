@@ -85,17 +85,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Novità, promozioni e i migliori brand fashion per donna, uomo e bambino su MyBrand Italia.",
       },
       { name: "author", content: "MyBrand Italia" },
-      { property: "og:title", content: "MyBrand Italia — Nuova collezione multibrand" },
-      {
-        property: "og:description",
-        content: "Scopri Donna, Uomo, Bambino e Accessori dai brand di tendenza. Spedizione e reso gratuiti, paga in 3 rate.",
-      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "MyBrand Italia — Nuova collezione multibrand" },
-      { name: "twitter:description", content: "Scopri Donna, Uomo, Bambino e Accessori dai brand di tendenza. Spedizione e reso gratuiti, paga in 3 rate." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/51b9cca5-e5ee-4a99-9fae-0f2203858a46/id-preview-35605b5f--55474a71-8f5e-45b8-b2f4-c8d35fd4ba90.lovable.app-1784760181513.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/51b9cca5-e5ee-4a99-9fae-0f2203858a46/id-preview-35605b5f--55474a71-8f5e-45b8-b2f4-c8d35fd4ba90.lovable.app-1784760181513.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
