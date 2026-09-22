@@ -24,14 +24,14 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           params={{ slug: product.slug }}
           className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <div className="relative aspect-[3/4] overflow-hidden bg-surface">
+          <div className="relative aspect-[3/4] overflow-hidden bg-surface p-1">
             <img
               src={variant.image}
               alt={`${product.brand} ${product.name} — ${variant.label}`}
               loading={priority ? "eager" : "lazy"}
               width={800}
               height={1066}
-              className="h-full w-full object-cover transition-opacity duration-300 md:group-hover:opacity-0"
+              className="h-full w-full object-contain transition-opacity duration-300 md:group-hover:opacity-0"
             />
             {variant.altImage && (
               <img
@@ -41,7 +41,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
                 loading="lazy"
                 width={800}
                 height={1066}
-                className="absolute inset-0 hidden h-full w-full object-cover opacity-0 transition-opacity duration-300 md:block md:group-hover:opacity-100"
+                className="absolute inset-0 hidden h-full w-full object-contain p-1 opacity-0 transition-opacity duration-300 md:block md:group-hover:opacity-100"
               />
             )}
 
@@ -116,7 +116,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
                   }`}
                 >
                   {v.image ? (
-                    <img src={v.image} alt="" width={56} height={64} loading="lazy" className="h-full w-full object-cover" />
+                    <img src={v.image} alt="" width={56} height={64} loading="lazy" className="h-full w-full object-contain" />
                   ) : (
                     <span className="block h-full w-full" style={{ background: v.hex }} />
                   )}

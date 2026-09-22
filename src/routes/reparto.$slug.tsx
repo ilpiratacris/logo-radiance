@@ -84,7 +84,7 @@ function DepartmentHome() {
           height={900}
           // eslint-disable-next-line react/no-unknown-property
           fetchPriority="high"
-          className="h-[46vh] w-full object-cover md:h-[52vh]"
+          className="h-[46vh] w-full bg-surface object-contain md:h-[52vh]"
         />
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 via-foreground/20 to-transparent">
           <div className="container-mb pb-6 md:pb-10">
@@ -166,7 +166,7 @@ function DepartmentHome() {
                   width={600}
                   height={600}
                   loading={i < 2 ? "eager" : "lazy"}
-                  className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="aspect-square w-full bg-surface object-contain transition-transform duration-500 group-hover:scale-[1.03]"
                 />
                 <span className="absolute bottom-0 left-0 m-2 bg-background px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.06em]">
                   {c.label}
@@ -196,7 +196,7 @@ function DepartmentHome() {
             width={1600}
             height={900}
             loading="lazy"
-            className="aspect-[4/5] w-full object-cover sm:aspect-[16/7]"
+            className="aspect-[4/5] w-full bg-surface object-contain sm:aspect-[16/7]"
           />
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-foreground/75 to-transparent p-5 md:p-8">
             <span className="inline-flex h-6 w-fit items-center bg-[color:var(--color-sale)] px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-background">
