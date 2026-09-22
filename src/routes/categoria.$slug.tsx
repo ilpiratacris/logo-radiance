@@ -1,214 +1,125 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { TopBar } from "@/components/site/TopBar";
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
-import { ProductCard } from "@/components/site/ProductCard";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { SiteLayout } from "@/components/site/SiteLayout";
+import { CatalogListing } from "@/components/site/CatalogListing";
+import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
-import { products, brands } from "@/lib/mock-data";
-import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
-import { useState } from "react";
+import {
+  categoryLabel,
+  departments,
+  navTree,
+  productsByDepartment,
+  type DepartmentSlug,
+} from "@/lib/catalog";
+import { validatePlpSearch, type PlpSearch } from "@/lib/filters";
+import { useStore } from "@/lib/store";
+import { useEffect } from "react";
+
+const isDep = (s: string): s is DepartmentSlug => departments.some((d) => d.slug === s);
 
 export const Route = createFileRoute("/categoria/$slug")({
+  validateSearch: (raw: Record<string, unknown>) => validatePlpSearch(raw),
   head: ({ params }) => {
-    const label = titleForSlug(params.slug);
+    const dep = isDep(params.slug) ? params.slug : "donna";
+    const label = departments.find((d) => d.slug === dep)!.label;
+    const title = `${label} — abbigliamento, calzature e accessori multibrand | MyBrand Italia`;
+    const description = `Scopri la selezione ${label.toLowerCase()} MyBrand Italia: novità, promozioni e i migliori brand. Filtra per brand, taglia, colore e prezzo.`;
     return {
       meta: [
-        { title: `${label} — MyBrand Italia` },
-        {
-          name: "description",
-          content: `Scopri la collezione ${label}: brand di tendenza, spedizione e reso gratuiti.`,
-        },
-        { property: "og:title", content: `${label} — MyBrand Italia` },
-        { property: "og:description", content: `Collezione ${label} multibrand su MyBrand Italia.` },
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
     };
   },
-  component: Category,
+  component: CategoryPage,
 });
 
-function titleForSlug(slug: string) {
-  return slug.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
-}
+function CategoryPage() {
+  const { slug } = Route.useParams();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/categoria/$slug" });
+  const { department, setDepartment } = useStore();
 
-const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-const colors = [
-  { name: "Nero", hex: "#111111" },
-  { name: "Bianco", hex: "#ffffff" },
-  { name: "Beige", hex: "#d9c4a7" },
-  { name: "Blu", hex: "#3b5b7a" },
-  { name: "Rosso", hex: "#c94a3a" },
-  { name: "Marrone", hex: "#7a5a44" },
-];
+  const dep: DepartmentSlug = isDep(slug) ? slug : department;
+  const depLabel = departments.find((d) => d.slug === dep)!.label;
 
-function Category() {
-  const { slug } = useParams({ from: "/categoria/$slug" });
-  const label = titleForSlug(slug);
-  const [mobileFilters, setMobileFilters] = useState(false);
+  useEffect(() => {
+    if (isDep(slug) && slug !== department) setDepartment(slug);
+  }, [slug, department, setDepartment]);
 
-  // demo: duplicate products to fill the grid
-  const items = [...products, ...products].slice(0, 12);
+  const all = productsByDepartment(dep);
+  const subCats = navTree[dep].flatMap((g) => g.items).slice(0, 14);
+
+  const onChange = (patch: Partial<PlpSearch>) =>
+    navigate({ params: { slug }, search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
+  const onClear = () => navigate({ params: { slug }, search: { cat: search.cat }, resetScroll: false });
+
+  const heading = search.novita === "1"
+    ? `Novità ${depLabel}`
+    : search.cat
+      ? `${categoryLabel(dep, search.cat)} ${depLabel}`
+      : depLabel;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <TopBar />
-      <Header />
+    <SiteLayout>
+      {/* breadcrumb */}
+      <nav aria-label="Breadcrumb" className="container-mb pt-3 text-xs text-muted-foreground">
+        <Link to="/" className="hover:text-foreground">
+          Home
+        </Link>
+        <span className="px-1.5">/</span>
+        <Link to="/categoria/$slug" params={{ slug: dep }} className="hover:text-foreground">
+          {depLabel}
+        </Link>
+        {search.cat && (
+          <>
+            <span className="px-1.5">/</span>
+            <span className="text-foreground">{categoryLabel(dep, search.cat)}</span>
+          </>
+        )}
+      </nav>
 
-      <main className="flex-1">
-        <div className="container-mb pt-6">
-          <nav className="text-xs text-muted-foreground">
-            <Link to="/" className="hover:text-foreground">
-              Home
-            </Link>
-            <span className="mx-1.5">/</span>
-            <span className="text-foreground">{label}</span>
-          </nav>
-          <div className="mt-4 flex items-baseline justify-between">
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{label}</h1>
-            <span className="text-xs text-muted-foreground">{items.length} risultati</span>
-          </div>
-        </div>
+      <header className="container-mb pt-2 pb-4">
+        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{heading}</h1>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {all.length} prodotti · PLACEHOLDER: conteggio reale dal catalogo
+        </p>
+      </header>
 
-        <div className="container-mb mt-6 grid gap-8 lg:grid-cols-[240px_1fr]">
-          {/* Sidebar Filters desktop */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-6">
-              <FilterGroup title="Brand">
-                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                  {brands.map((b) => (
-                    <label key={b} className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" className="h-3.5 w-3.5 accent-foreground" />
-                      <span>{b}</span>
-                    </label>
-                  ))}
-                </div>
-              </FilterGroup>
+      {/* sottocategorie: fila scrollabile su mobile */}
+      <div className="flex gap-2 overflow-x-auto px-4 pb-4 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <Link
+          to="/categoria/$slug"
+          params={{ slug: dep }}
+          search={{}}
+          className={`flex h-10 shrink-0 items-center border px-3 text-xs font-medium ${
+            !search.cat ? "border-foreground bg-foreground text-background" : "border-border"
+          }`}
+        >
+          Tutto
+        </Link>
+        {subCats.map((c) => (
+          <Link
+            key={c.slug}
+            to="/categoria/$slug"
+            params={{ slug: dep }}
+            search={{ cat: c.slug }}
+            className={`flex h-10 shrink-0 items-center border px-3 text-xs font-medium ${
+              search.cat === c.slug ? "border-foreground bg-foreground text-background" : "border-border"
+            }`}
+          >
+            {c.label}
+          </Link>
+        ))}
+      </div>
 
-              <FilterGroup title="Taglia">
-                <div className="grid grid-cols-3 gap-2">
-                  {sizes.map((s) => (
-                    <button
-                      key={s}
-                      className="h-9 border border-border text-xs font-medium hover:border-foreground"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </FilterGroup>
+      <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />
 
-              <FilterGroup title="Colore">
-                <div className="grid grid-cols-6 gap-2">
-                  {colors.map((c) => (
-                    <button
-                      key={c.name}
-                      title={c.name}
-                      className="h-7 w-7 rounded-full border border-border ring-offset-2 hover:ring-1 hover:ring-foreground"
-                      style={{ background: c.hex }}
-                    />
-                  ))}
-                </div>
-              </FilterGroup>
-
-              <FilterGroup title="Prezzo">
-                <div className="flex gap-2">
-                  <input placeholder="Min" className="h-9 w-full border border-border bg-background px-2 text-xs" />
-                  <input placeholder="Max" className="h-9 w-full border border-border bg-background px-2 text-xs" />
-                </div>
-              </FilterGroup>
-            </div>
-          </aside>
-
-          {/* Products area */}
-          <div>
-            {/* Trust bar + toolbar */}
-            <div className="mb-6 space-y-4">
-              <TrustBar />
-              <div className="flex items-center justify-between gap-4">
-                <button
-                  onClick={() => setMobileFilters(true)}
-                  className="lg:hidden inline-flex items-center gap-2 border border-border-strong px-3 h-10 text-sm"
-                >
-                  <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} /> Filtri
-                </button>
-                <div className="ml-auto flex items-center gap-2">
-                  <label className="text-xs text-muted-foreground">Ordina:</label>
-                  <div className="relative">
-                    <select className="appearance-none border border-border bg-background pl-3 pr-8 h-10 text-sm">
-                      <option>Novità</option>
-                      <option>Prezzo crescente</option>
-                      <option>Prezzo decrescente</option>
-                      <option>Più popolari</option>
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 xl:grid-cols-4">
-              {items.map((p, i) => (
-                <ProductCard key={`${p.slug}-${i}`} product={p} />
-              ))}
-            </div>
-
-            <div className="mt-12 flex justify-center">
-              <button className="btn-outline">Carica altri prodotti</button>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* Mobile filters drawer */}
-      {mobileFilters && (
-        <div className="fixed inset-0 z-50 bg-foreground/40 lg:hidden" onClick={() => setMobileFilters(false)}>
-          <div className="ml-auto h-full w-[90%] max-w-sm bg-background p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <div className="text-base font-semibold">Filtri</div>
-              <button onClick={() => setMobileFilters(false)}><X className="h-6 w-6" strokeWidth={1.5} /></button>
-            </div>
-            <div className="space-y-6">
-              <FilterGroup title="Brand">
-                <div className="space-y-2 max-h-56 overflow-y-auto">
-                  {brands.map((b) => (
-                    <label key={b} className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" className="h-3.5 w-3.5 accent-foreground" />
-                      <span>{b}</span>
-                    </label>
-                  ))}
-                </div>
-              </FilterGroup>
-              <FilterGroup title="Taglia">
-                <div className="grid grid-cols-4 gap-2">
-                  {sizes.map((s) => (
-                    <button key={s} className="h-10 border border-border text-xs font-medium">{s}</button>
-                  ))}
-                </div>
-              </FilterGroup>
-              <FilterGroup title="Colore">
-                <div className="grid grid-cols-6 gap-2">
-                  {colors.map((c) => (
-                    <button key={c.name} className="h-8 w-8 rounded-full border border-border" style={{ background: c.hex }} />
-                  ))}
-                </div>
-              </FilterGroup>
-            </div>
-            <button onClick={() => setMobileFilters(false)} className="btn-primary w-full mt-8">
-              Mostra risultati
-            </button>
-          </div>
-        </div>
-      )}
-
-      <Footer />
-    </div>
-  );
-}
-
-function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="border-b border-border pb-6">
-      <div className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">{title}</div>
-      {children}
-    </div>
+      <RecentlyViewed />
+      <TrustBar />
+    </SiteLayout>
   );
 }

@@ -1,108 +1,183 @@
 import { Link } from "@tanstack/react-router";
-import { Search, User, Heart, ShoppingBag, Menu, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/mybrand-logo.avif.asset.json";
-import { mainNav } from "@/lib/mock-data";
+import { departments, navTree } from "@/lib/catalog";
+import { useStore } from "@/lib/store";
+import { MegaMenu, type MegaKey } from "@/components/site/MegaMenu";
+import { MobileMenu } from "@/components/site/MobileMenu";
 
 export function Header() {
-  const [open, setOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const { department, setDepartment, cartCount, wishlist, setSearchOpen, openCart, hydrated } = useStore();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mega, setMega] = useState<MegaKey | null>(null);
+
+  const secondRow: { key: MegaKey | "novita"; label: string }[] = [
+    { key: "novita", label: "Novità" },
+    ...navTree[department].map((g) => ({ key: g.slug as MegaKey, label: g.label })),
+    { key: "brand", label: "Brand" },
+    { key: "promo", label: "Promo" },
+  ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-      <div className="container-mb flex h-16 items-center justify-between gap-6 lg:h-20">
-        <div className="flex items-center gap-3 lg:gap-8">
-          <button
-            aria-label="Apri menu"
-            className="lg:hidden"
-            onClick={() => setOpen(true)}
-          >
-            <Menu className="h-6 w-6" strokeWidth={1.5} />
-          </button>
-          <Link to="/" className="flex items-center">
-            <img
-              src={logo.url}
-              alt="MyBrand"
-              width={120}
-              height={40}
-              className="h-8 w-auto lg:h-10"
-            />
-          </Link>
-        </div>
-
-        <nav className="hidden lg:flex items-center gap-8">
-          {mainNav.slice(0, 8).map((item) => (
-            <Link
-              key={item.label}
-              to={item.href}
-              className="text-sm font-medium text-foreground/85 hover:text-foreground transition-colors"
-              activeProps={{ className: "text-foreground" }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-1 sm:gap-2">
-          {searchOpen ? (
-            <div className="flex items-center gap-2 rounded-sm border border-border-strong bg-background px-3">
-              <Search className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              <input
-                autoFocus
-                placeholder="Cerca prodotti, brand..."
-                className="h-9 w-40 bg-transparent text-sm outline-none sm:w-64"
-                onBlur={() => setSearchOpen(false)}
-              />
-            </div>
-          ) : (
+    <>
+      <header className="sticky top-0 z-50 bg-background" onMouseLeave={() => setMega(null)}>
+        {/* ---------- MOBILE ---------- */}
+        <div className="border-b border-border lg:hidden">
+          <div className="flex h-14 items-center justify-between px-2">
             <button
-              aria-label="Cerca"
-              onClick={() => setSearchOpen(true)}
-              className="p-2 hover:bg-surface rounded-sm"
+              aria-label="Apri menu"
+              onClick={() => setMenuOpen(true)}
+              className="flex h-11 w-11 items-center justify-center"
             >
-              <Search className="h-5 w-5" strokeWidth={1.5} />
+              <Menu className="h-6 w-6" strokeWidth={1.5} />
             </button>
-          )}
-          <button aria-label="Account" className="p-2 hover:bg-surface rounded-sm hidden sm:block">
-            <User className="h-5 w-5" strokeWidth={1.5} />
-          </button>
-          <button aria-label="Preferiti" className="p-2 hover:bg-surface rounded-sm hidden sm:block">
-            <Heart className="h-5 w-5" strokeWidth={1.5} />
-          </button>
-          <button aria-label="Carrello" className="relative p-2 hover:bg-surface rounded-sm">
-            <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-accent-foreground">
-              2
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 bg-foreground/40 lg:hidden" onClick={() => setOpen(false)}>
-          <div className="h-full w-[85%] max-w-sm bg-background p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-8">
-              <img src={logo.url} alt="MyBrand" className="h-8" />
-              <button aria-label="Chiudi" onClick={() => setOpen(false)}>
-                <X className="h-6 w-6" strokeWidth={1.5} />
+            <Link to="/" aria-label="MyBrand Italia, home" className="flex items-center px-1">
+              <img src={logo.url} alt="MyBrand Italia" width={110} height={28} className="h-7 w-auto" />
+            </Link>
+            <div className="flex items-center">
+              <button
+                aria-label="Cerca"
+                onClick={() => setSearchOpen(true)}
+                className="flex h-11 w-11 items-center justify-center"
+              >
+                <Search className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+              <Link to="/wishlist" aria-label="Wishlist" className="relative flex h-11 w-11 items-center justify-center">
+                <Heart className="h-5 w-5" strokeWidth={1.5} />
+                {hydrated && wishlist.length > 0 && <Dot>{wishlist.length}</Dot>}
+              </Link>
+              <button
+                aria-label="Carrello"
+                onClick={openCart}
+                className="relative flex h-11 w-11 items-center justify-center"
+              >
+                <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+                {hydrated && cartCount > 0 && <Dot>{cartCount}</Dot>}
               </button>
             </div>
-            <nav className="flex flex-col divide-y divide-border">
-              {mainNav.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  onClick={() => setOpen(false)}
-                  className="py-4 text-base font-medium"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+          </div>
+
+          {/* tab reparti sempre visibili su mobile */}
+          <div className="grid grid-cols-3 border-t border-border">
+            {departments.map((d) => (
+              <Link
+                key={d.slug}
+                to="/categoria/$slug"
+                params={{ slug: d.slug }}
+                onClick={() => setDepartment(d.slug)}
+                className={`flex h-11 items-center justify-center text-xs font-semibold uppercase tracking-[0.12em] ${
+                  department === d.slug
+                    ? "border-b-2 border-foreground"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {d.label}
+              </Link>
+            ))}
           </div>
         </div>
-      )}
-    </header>
+
+        {/* ---------- DESKTOP ---------- */}
+        <div className="hidden lg:block">
+          <div className="border-b border-border">
+            <div className="container-mb flex h-[68px] items-center gap-8">
+              <Link to="/" aria-label="MyBrand Italia, home">
+                <img src={logo.url} alt="MyBrand Italia" width={150} height={40} className="h-9 w-auto" />
+              </Link>
+
+              <nav aria-label="Reparti" className="flex h-full items-stretch gap-1">
+                {departments.map((d) => (
+                  <Link
+                    key={d.slug}
+                    to="/categoria/$slug"
+                    params={{ slug: d.slug }}
+                    onClick={() => setDepartment(d.slug)}
+                    onMouseEnter={() => setDepartment(d.slug)}
+                    className={`flex items-center px-4 text-sm font-semibold uppercase tracking-[0.12em] ${
+                      department === d.slug
+                        ? "border-b-2 border-foreground text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {d.label}
+                  </Link>
+                ))}
+              </nav>
+
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="ml-auto flex h-10 w-64 items-center gap-2 border border-border-strong px-3 text-sm text-muted-foreground hover:border-foreground xl:w-80"
+              >
+                <Search className="h-4 w-4" strokeWidth={1.5} />
+                Cerca prodotti, brand…
+              </button>
+
+              <div className="flex items-center">
+                <Link to="/account" aria-label="Account" className="flex h-11 w-11 items-center justify-center">
+                  <User className="h-5 w-5" strokeWidth={1.5} />
+                </Link>
+                <Link to="/wishlist" aria-label="Wishlist" className="relative flex h-11 w-11 items-center justify-center">
+                  <Heart className="h-5 w-5" strokeWidth={1.5} />
+                  {hydrated && wishlist.length > 0 && <Dot>{wishlist.length}</Dot>}
+                </Link>
+                <button onClick={openCart} aria-label="Carrello" className="relative flex h-11 w-11 items-center justify-center">
+                  <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+                  {hydrated && cartCount > 0 && <Dot>{cartCount}</Dot>}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-b border-border">
+            <div className="container-mb flex h-11 items-stretch gap-7">
+              {secondRow.map((item) =>
+                item.key === "novita" ? (
+                  <Link
+                    key="novita"
+                    to="/categoria/$slug"
+                    params={{ slug: department }}
+                    search={{ novita: "1" }}
+                    onMouseEnter={() => setMega(null)}
+                    className="flex items-center text-[13px] font-medium uppercase tracking-[0.08em] hover:underline"
+                  >
+                    Novità
+                  </Link>
+                ) : (
+                  <button
+                    key={item.key}
+                    onMouseEnter={() => setMega(item.key as MegaKey)}
+                    onFocus={() => setMega(item.key as MegaKey)}
+                    onClick={() => setMega(mega === item.key ? null : (item.key as MegaKey))}
+                    aria-expanded={mega === item.key}
+                    className={`flex items-center text-[13px] font-medium uppercase tracking-[0.08em] ${
+                      item.key === "promo" ? "text-[color:var(--color-sale)]" : ""
+                    } ${mega === item.key ? "underline underline-offset-[10px]" : ""}`}
+                  >
+                    {item.label}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+
+          {mega && (
+            <div className="absolute inset-x-0 top-full">
+              <MegaMenu active={mega} department={department} onNavigate={() => setMega(null)} />
+            </div>
+          )}
+        </div>
+      </header>
+
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+    </>
+  );
+}
+
+function Dot({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-semibold leading-none text-background">
+      {children}
+    </span>
   );
 }

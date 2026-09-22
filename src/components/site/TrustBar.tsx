@@ -1,16 +1,22 @@
-import { Truck, RotateCcw, CreditCard } from "lucide-react";
+import { Truck, RotateCcw, CreditCard, Headphones } from "lucide-react";
 
-export function TrustBar() {
-  const items = [
-    { icon: Truck, title: "Spedizione gratuita", sub: "BRT FermoPoint" },
-    { icon: RotateCcw, title: "Reso gratuito", sub: "Cambio o buono acquisto" },
-    { icon: CreditCard, title: "Paga in 3 rate", sub: "Klarna · Scalapay" },
-  ];
+const items = [
+  { icon: Truck, title: "Spedizione tracciata", sub: "Consegna in tutta Italia" },
+  { icon: RotateCcw, title: "Reso facile", sub: "Condizioni da backend" },
+  { icon: CreditCard, title: "Pagamenti sicuri", sub: "Metodi da backend" },
+  { icon: Headphones, title: "Assistenza", sub: "Ti rispondiamo sempre" },
+];
+
+export function TrustBar({ compact }: { compact?: boolean }) {
   return (
-    <div className="border border-border bg-background rounded-sm">
-      <ul className="divide-y divide-border md:divide-y-0 md:divide-x md:grid md:grid-cols-3">
+    <section className={compact ? "" : "border-t border-border bg-surface py-8"}>
+      <ul
+        className={`container-mb grid gap-4 ${
+          compact ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-4"
+        }`}
+      >
         {items.map(({ icon: Icon, title, sub }) => (
-          <li key={title} className="flex items-center gap-3 p-4">
+          <li key={title} className="flex items-center gap-3">
             <Icon className="h-5 w-5 shrink-0" strokeWidth={1.5} />
             <div>
               <div className="text-xs font-semibold">{title}</div>
@@ -19,6 +25,6 @@ export function TrustBar() {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

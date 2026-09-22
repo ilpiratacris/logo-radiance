@@ -9,13 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as CarrelloRouteImport } from './routes/carrello'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BrandIndexRouteImport } from './routes/brand.index'
+import { Route as PromoSlugRouteImport } from './routes/promo.$slug'
 import { Route as ProdottoSlugRouteImport } from './routes/prodotto.$slug'
 import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
+import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarrelloRoute = CarrelloRouteImport.update({
+  id: '/carrello',
+  path: '/carrello',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandIndexRoute = BrandIndexRouteImport.update({
+  id: '/brand/',
+  path: '/brand/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromoSlugRoute = PromoSlugRouteImport.update({
+  id: '/promo/$slug',
+  path: '/promo/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProdottoSlugRoute = ProdottoSlugRouteImport.update({
@@ -28,44 +59,136 @@ const CategoriaSlugRoute = CategoriaSlugRouteImport.update({
   path: '/categoria/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrandSlugRoute = BrandSlugRouteImport.update({
+  id: '/brand/$slug',
+  path: '/brand/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/carrello': typeof CarrelloRoute
+  '/wishlist': typeof WishlistRoute
+  '/brand/$slug': typeof BrandSlugRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
+  '/promo/$slug': typeof PromoSlugRoute
+  '/brand/': typeof BrandIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/carrello': typeof CarrelloRoute
+  '/wishlist': typeof WishlistRoute
+  '/brand/$slug': typeof BrandSlugRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
+  '/promo/$slug': typeof PromoSlugRoute
+  '/brand': typeof BrandIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/carrello': typeof CarrelloRoute
+  '/wishlist': typeof WishlistRoute
+  '/brand/$slug': typeof BrandSlugRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
+  '/promo/$slug': typeof PromoSlugRoute
+  '/brand/': typeof BrandIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/categoria/$slug' | '/prodotto/$slug'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/carrello'
+    | '/wishlist'
+    | '/brand/$slug'
+    | '/categoria/$slug'
+    | '/prodotto/$slug'
+    | '/promo/$slug'
+    | '/brand/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/categoria/$slug' | '/prodotto/$slug'
-  id: '__root__' | '/' | '/categoria/$slug' | '/prodotto/$slug'
+  to:
+    | '/'
+    | '/account'
+    | '/carrello'
+    | '/wishlist'
+    | '/brand/$slug'
+    | '/categoria/$slug'
+    | '/prodotto/$slug'
+    | '/promo/$slug'
+    | '/brand'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/carrello'
+    | '/wishlist'
+    | '/brand/$slug'
+    | '/categoria/$slug'
+    | '/prodotto/$slug'
+    | '/promo/$slug'
+    | '/brand/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  CarrelloRoute: typeof CarrelloRoute
+  WishlistRoute: typeof WishlistRoute
+  BrandSlugRoute: typeof BrandSlugRoute
   CategoriaSlugRoute: typeof CategoriaSlugRoute
   ProdottoSlugRoute: typeof ProdottoSlugRoute
+  PromoSlugRoute: typeof PromoSlugRoute
+  BrandIndexRoute: typeof BrandIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carrello': {
+      id: '/carrello'
+      path: '/carrello'
+      fullPath: '/carrello'
+      preLoaderRoute: typeof CarrelloRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand/': {
+      id: '/brand/'
+      path: '/brand'
+      fullPath: '/brand/'
+      preLoaderRoute: typeof BrandIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo/$slug': {
+      id: '/promo/$slug'
+      path: '/promo/$slug'
+      fullPath: '/promo/$slug'
+      preLoaderRoute: typeof PromoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prodotto/$slug': {
@@ -82,13 +205,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brand/$slug': {
+      id: '/brand/$slug'
+      path: '/brand/$slug'
+      fullPath: '/brand/$slug'
+      preLoaderRoute: typeof BrandSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  CarrelloRoute: CarrelloRoute,
+  WishlistRoute: WishlistRoute,
+  BrandSlugRoute: BrandSlugRoute,
   CategoriaSlugRoute: CategoriaSlugRoute,
   ProdottoSlugRoute: ProdottoSlugRoute,
+  PromoSlugRoute: PromoSlugRoute,
+  BrandIndexRoute: BrandIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
