@@ -15,6 +15,7 @@ import {
   productsByDepartment,
   promoProducts,
   type DepartmentSlug,
+  type Product,
 } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 
