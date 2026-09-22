@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { StoreProvider } from "../lib/store";
 
 function NotFoundComponent() {
   return (
@@ -77,11 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MyBrand Italia — Nuova collezione multibrand" },
+      { title: "MyBrand Italia — moda multibrand donna, uomo e bambino" },
       {
         name: "description",
         content:
-          "Scopri Donna, Uomo, Bambino e Accessori dai brand di tendenza. Spedizione e reso gratuiti, paga in 3 rate.",
+          "Novità, promozioni e i migliori brand fashion per donna, uomo e bambino su MyBrand Italia.",
       },
       { name: "author", content: "MyBrand Italia" },
       { property: "og:title", content: "MyBrand Italia — Nuova collezione multibrand" },
@@ -132,8 +133,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <StoreProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </StoreProvider>
     </QueryClientProvider>
   );
 }
