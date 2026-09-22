@@ -73,7 +73,7 @@ function Home() {
             height={1080}
             // eslint-disable-next-line react/no-unknown-property
             fetchPriority="high"
-            className="h-[60vh] w-full bg-surface object-contain md:h-[62vh]"
+            className="h-[calc(100svh-7.75rem)] min-h-[560px] w-full object-cover object-top md:h-[calc(100svh-8.5rem)] md:min-h-[620px]"
           />
         </picture>
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 via-foreground/20 to-transparent">
