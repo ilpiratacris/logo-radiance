@@ -4,6 +4,7 @@ import { CatalogListing } from "@/components/site/CatalogListing";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
 import {
+  categoryCopy,
   categoryLabel,
   departments,
   navTree,
@@ -87,6 +88,7 @@ function CategoryPage() {
         <p className="mt-1 text-xs text-muted-foreground">
           {all.length} prodotti · PLACEHOLDER: conteggio reale dal catalogo
         </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{copy.short}</p>
       </header>
 
       {/* sottocategorie: fila scrollabile su mobile */}
@@ -117,6 +119,22 @@ function CategoryPage() {
       </div>
 
       <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />
+
+      {/* descrizione lunga: in fondo, non spinge i prodotti in basso */}
+      <section className="container-mb py-8">
+        <details className="group max-w-2xl border-t border-border pt-4">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-semibold">
+            {heading}: informazioni sulla categoria
+            <span className="text-xs font-medium text-muted-foreground group-open:hidden">Leggi di più</span>
+            <span className="hidden text-xs font-medium text-muted-foreground group-open:inline">Chiudi</span>
+          </summary>
+          <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
+            {copy.long.map((par) => (
+              <p key={par.slice(0, 24)}>{par}</p>
+            ))}
+          </div>
+        </details>
+      </section>
 
       <RecentlyViewed />
       <TrustBar />
