@@ -58,6 +58,8 @@ function CategoryPage() {
     navigate({ params: { slug }, search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
   const onClear = () => navigate({ params: { slug }, search: { cat: search.cat }, resetScroll: false });
 
+  const copy = categoryCopy(dep, search.cat);
+
   const heading = search.novita === "1"
     ? `Novità ${depLabel}`
     : search.cat
@@ -129,7 +131,7 @@ function CategoryPage() {
             <span className="hidden text-xs font-medium text-muted-foreground group-open:inline">Chiudi</span>
           </summary>
           <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            {copy.long.map((par) => (
+            {copy.long.map((par: string) => (
               <p key={par.slice(0, 24)}>{par}</p>
             ))}
           </div>

@@ -5,6 +5,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { SizeGuide } from "@/components/site/SizeGuide";
+import { BrandMark } from "@/components/site/BrandMark";
 import {
   brandSlug,
   discountOf,
