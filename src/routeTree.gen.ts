@@ -14,6 +14,7 @@ import { Route as CarrelloRouteImport } from './routes/carrello'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BrandIndexRouteImport } from './routes/brand.index'
+import { Route as RepartoSlugRouteImport } from './routes/reparto.$slug'
 import { Route as PromoSlugRouteImport } from './routes/promo.$slug'
 import { Route as ProdottoSlugRouteImport } from './routes/prodotto.$slug'
 import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const BrandIndexRoute = BrandIndexRouteImport.update({
   id: '/brand/',
   path: '/brand/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RepartoSlugRoute = RepartoSlugRouteImport.update({
+  id: '/reparto/$slug',
+  path: '/reparto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromoSlugRoute = PromoSlugRouteImport.update({
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
   '/promo/$slug': typeof PromoSlugRoute
+  '/reparto/$slug': typeof RepartoSlugRoute
   '/brand/': typeof BrandIndexRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
   '/promo/$slug': typeof PromoSlugRoute
+  '/reparto/$slug': typeof RepartoSlugRoute
   '/brand': typeof BrandIndexRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
   '/promo/$slug': typeof PromoSlugRoute
+  '/reparto/$slug': typeof RepartoSlugRoute
   '/brand/': typeof BrandIndexRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/categoria/$slug'
     | '/prodotto/$slug'
     | '/promo/$slug'
+    | '/reparto/$slug'
     | '/brand/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/categoria/$slug'
     | '/prodotto/$slug'
     | '/promo/$slug'
+    | '/reparto/$slug'
     | '/brand'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/categoria/$slug'
     | '/prodotto/$slug'
     | '/promo/$slug'
+    | '/reparto/$slug'
     | '/brand/'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   CategoriaSlugRoute: typeof CategoriaSlugRoute
   ProdottoSlugRoute: typeof ProdottoSlugRoute
   PromoSlugRoute: typeof PromoSlugRoute
+  RepartoSlugRoute: typeof RepartoSlugRoute
   BrandIndexRoute: typeof BrandIndexRoute
 }
 
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/brand'
       fullPath: '/brand/'
       preLoaderRoute: typeof BrandIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reparto/$slug': {
+      id: '/reparto/$slug'
+      path: '/reparto/$slug'
+      fullPath: '/reparto/$slug'
+      preLoaderRoute: typeof RepartoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/promo/$slug': {
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriaSlugRoute: CategoriaSlugRoute,
   ProdottoSlugRoute: ProdottoSlugRoute,
   PromoSlugRoute: PromoSlugRoute,
+  RepartoSlugRoute: RepartoSlugRoute,
   BrandIndexRoute: BrandIndexRoute,
 }
 export const routeTree = rootRouteImport

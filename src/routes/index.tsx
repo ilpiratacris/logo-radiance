@@ -89,9 +89,8 @@ function Home() {
               {hero.cta.map((c) => (
                 <Link
                   key={c.to}
-                  to="/categoria/$slug"
+                  to="/reparto/$slug"
                   params={{ slug: c.to }}
-                  search={{ novita: "1" }}
                   className="flex h-12 min-w-[46%] flex-1 items-center justify-center bg-background px-5 text-sm font-semibold text-foreground md:min-w-0 md:flex-none md:px-6"
                 >
                   {c.label}
@@ -106,7 +105,7 @@ function Home() {
       <section className="container-mb py-6">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           {departments.map((d) => (
-            <Link key={d.slug} to="/categoria/$slug" params={{ slug: d.slug }} className="group block">
+            <Link key={d.slug} to="/reparto/$slug" params={{ slug: d.slug }} className="group block">
               <img
                 src={d.image}
                 alt={d.label}

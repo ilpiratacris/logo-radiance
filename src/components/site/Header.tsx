@@ -70,7 +70,7 @@ export function Header() {
             {departments.map((d) => (
               <Link
                 key={d.slug}
-                to="/categoria/$slug"
+                to="/reparto/$slug"
                 params={{ slug: d.slug }}
                 onClick={() => setDepartment(d.slug)}
                 className={`flex h-11 items-center justify-center text-xs font-semibold uppercase tracking-[0.12em] ${
@@ -97,7 +97,7 @@ export function Header() {
                 {departments.map((d) => (
                   <Link
                     key={d.slug}
-                    to="/categoria/$slug"
+                    to="/reparto/$slug"
                     params={{ slug: d.slug }}
                     onClick={() => {
                       setDepartment(d.slug);
