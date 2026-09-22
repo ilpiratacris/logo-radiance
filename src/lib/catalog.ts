@@ -150,7 +150,15 @@ export function categoryLabel(dep: DepartmentSlug, slug: string): string {
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
 
-export type Brand = { slug: string; name: string; featured?: boolean; image?: string; claim?: string };
+export type Brand = {
+  slug: string;
+  name: string;
+  featured?: boolean;
+  image?: string;
+  /** PLACEHOLDER: logo ufficiale del brand, da backend */
+  logo?: string;
+  claim?: string;
+};
 
 export const brands: Brand[] = [
   { slug: "peuterey", name: "Peuterey", featured: true, image: jacket, claim: "Capispalla italiano, dal 1992." },
@@ -399,6 +407,7 @@ export const campaigns: Campaign[] = [
     cta: [
       { label: "Shop Donna", to: "donna" },
       { label: "Shop Uomo", to: "uomo" },
+      { label: "Shop Bambino", to: "bambino" },
     ],
   },
   {
