@@ -72,7 +72,7 @@ export function Header() {
                 to="/reparto/$slug"
                 params={{ slug: d.slug }}
                 onClick={() => setDepartment(d.slug)}
-                className={`flex h-11 items-center justify-center text-xs font-semibold uppercase tracking-[0.12em] ${
+                className={`flex h-11 items-center justify-center text-[13px] font-bold uppercase tracking-[0.12em] ${
                   department === d.slug
                     ? "border-b-2 border-foreground"
                     : "text-muted-foreground"
@@ -102,7 +102,7 @@ export function Header() {
                       setDepartment(d.slug);
                       setMega(null);
                     }}
-                    className={`flex items-center px-4 text-sm font-semibold uppercase tracking-[0.12em] ${
+                    className={`flex items-center px-4 text-[15px] font-bold uppercase tracking-[0.12em] ${
                       department === d.slug
                         ? "border-b-2 border-foreground text-foreground"
                         : "text-muted-foreground hover:text-foreground"
@@ -151,7 +151,7 @@ export function Header() {
                       search={isNew ? { novita: "1" } : { cat }}
                       onClick={() => setMega(null)}
                       onMouseEnter={() => setMega(null)}
-                      className={`flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] hover:underline ${
+                      className={`flex items-center whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] hover:underline ${
                         item.accent ? "text-[color:var(--color-sale)]" : ""
                       }`}
                     >
@@ -164,7 +164,7 @@ export function Header() {
                     key={item.key}
                     onMouseEnter={() => setMega(item.key as MegaKey)}
                     aria-expanded={mega === item.key}
-                    className={`flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] ${
+                    className={`flex items-center whitespace-nowrap text-sm font-semibold uppercase tracking-[0.08em] ${
                       mega === item.key ? "underline underline-offset-[10px]" : ""
                     }`}
                   >

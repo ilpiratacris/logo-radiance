@@ -73,7 +73,7 @@ function Home() {
             height={1080}
             // eslint-disable-next-line react/no-unknown-property
             fetchPriority="high"
-            className="h-[60vh] w-full object-cover md:h-[62vh]"
+            className="h-[60vh] w-full bg-surface object-contain md:h-[62vh]"
           />
         </picture>
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 via-foreground/20 to-transparent">
@@ -112,7 +112,7 @@ function Home() {
                 width={600}
                 height={750}
                 loading="lazy"
-                className="aspect-[4/5] w-full object-cover md:aspect-[3/4]"
+                className="aspect-[4/5] w-full bg-surface object-contain md:aspect-[3/4]"
               />
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-sm font-semibold uppercase tracking-[0.08em]">{d.label}</span>
@@ -157,7 +157,7 @@ function Home() {
                   width={600}
                   height={600}
                   loading={i < 2 ? "eager" : "lazy"}
-                  className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="aspect-square w-full bg-surface object-contain transition-transform duration-500 group-hover:scale-[1.03]"
                 />
                 <span className="absolute bottom-0 left-0 m-2 bg-background px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.06em]">
                   {c.label}
@@ -189,7 +189,7 @@ function Home() {
             width={1600}
             height={900}
             loading="lazy"
-            className="aspect-[4/5] w-full object-cover sm:aspect-[16/7]"
+            className="aspect-[4/5] w-full bg-surface object-contain sm:aspect-[16/7]"
           />
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-foreground/75 to-transparent p-5 md:p-8">
             <span className="inline-flex h-6 w-fit items-center bg-[color:var(--color-sale)] px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-background">
@@ -217,7 +217,7 @@ function Home() {
             width={1600}
             height={1000}
             loading="lazy"
-            className="aspect-[4/3] w-full object-cover"
+            className="aspect-[4/3] w-full bg-surface object-contain"
           />
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-background/70">

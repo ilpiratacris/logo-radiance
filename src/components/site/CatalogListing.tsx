@@ -1,7 +1,7 @@
 import { SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ProductGrid } from "@/components/site/ProductGrid";
-import { FilterDrawer, FilterSections } from "@/components/site/FilterDrawer";
+import { FilterDrawer } from "@/components/site/FilterDrawer";
 import { SortSheet } from "@/components/site/SortSheet";
 import {
   activeChips,
@@ -83,15 +83,8 @@ export function CatalogListing({
         )}
       </div>
 
-      <div className="container-mb flex gap-8 py-6">
-        {/* filtri desktop */}
-        <aside className="hidden w-64 shrink-0 lg:block">
-          <div className="border border-border">
-            <FilterSections facets={facets} value={value} onChange={onChange} />
-          </div>
-        </aside>
-
-        <div className="min-w-0 flex-1">
+      <div className="container-mb py-6">
+        <div className="min-w-0">
           <div className="mb-3 text-xs text-muted-foreground lg:hidden">{results.length} prodotti</div>
           {results.length === 0 ? (
             <div className="py-16 text-center">

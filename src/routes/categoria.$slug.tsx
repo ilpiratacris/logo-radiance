@@ -1,9 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { CatalogListing } from "@/components/site/CatalogListing";
-import { TrustBar } from "@/components/site/TrustBar";
 import {
-  categoryCopy,
   categoryLabel,
   departments,
   navTree,
@@ -57,8 +55,6 @@ function CategoryPage() {
     navigate({ params: { slug }, search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
   const onClear = () => navigate({ params: { slug }, search: { cat: search.cat }, resetScroll: false });
 
-  const copy = categoryCopy(dep, search.cat);
-
   const heading = search.novita === "1"
     ? `Novità ${depLabel}`
     : search.cat
@@ -89,7 +85,6 @@ function CategoryPage() {
         <p className="mt-1 text-xs text-muted-foreground">
           {all.length} prodotti · PLACEHOLDER: conteggio reale dal catalogo
         </p>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{copy.short}</p>
       </header>
 
       {/* sottocategorie: fila scrollabile su mobile */}
@@ -120,20 +115,6 @@ function CategoryPage() {
       </div>
 
       <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />
-
-      {/* descrizione lunga sempre visibile e a tutta larghezza */}
-      <section className="border-t border-border py-8 md:py-10">
-        <div className="container-mb">
-          <h2 className="text-lg font-semibold">{heading}: informazioni sulla categoria</h2>
-          <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {copy.long.map((par: string) => (
-              <p key={par.slice(0, 24)}>{par}</p>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <TrustBar />
     </SiteLayout>
   );
 }
