@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { CatalogListing } from "@/components/site/CatalogListing";
-import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
 import {
   categoryCopy,
@@ -122,23 +121,18 @@ function CategoryPage() {
 
       <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />
 
-      {/* descrizione lunga: in fondo, non spinge i prodotti in basso */}
-      <section className="container-mb py-8">
-        <details className="group max-w-2xl border-t border-border pt-4">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-semibold">
-            {heading}: informazioni sulla categoria
-            <span className="text-xs font-medium text-muted-foreground group-open:hidden">Leggi di più</span>
-            <span className="hidden text-xs font-medium text-muted-foreground group-open:inline">Chiudi</span>
-          </summary>
-          <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
+      {/* descrizione lunga sempre visibile e a tutta larghezza */}
+      <section className="border-t border-border py-8 md:py-10">
+        <div className="container-mb">
+          <h2 className="text-lg font-semibold">{heading}: informazioni sulla categoria</h2>
+          <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground md:text-base">
             {copy.long.map((par: string) => (
               <p key={par.slice(0, 24)}>{par}</p>
             ))}
           </div>
-        </details>
+        </div>
       </section>
 
-      <RecentlyViewed />
       <TrustBar />
     </SiteLayout>
   );
