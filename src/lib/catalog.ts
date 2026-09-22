@@ -428,3 +428,51 @@ export const campaigns: Campaign[] = [
 ];
 
 export const editorialImage = editorial;
+
+/* ------------------------------------------------------------------ */
+/* Testi di categoria (breve + lungo)                                  */
+/* PLACEHOLDER: contenuti SEO gestibili da backend / CMS.              */
+/* ------------------------------------------------------------------ */
+
+export type CategoryCopy = { short: string; long: string[] };
+
+const depCopy: Record<DepartmentSlug, CategoryCopy> = {
+  donna: {
+    short:
+      "Abbigliamento, calzature e accessori donna dei migliori brand: novità di stagione, capispalla, denim e borse.",
+    long: [
+      "Nella sezione donna di MyBrand Italia trovi una selezione multibrand aggiornata ogni settimana: abiti, maglieria, felpe, camicie, jeans, giacche e cappotti insieme a sneakers, stivaletti e borse. Ogni capo è scelto tra le collezioni ufficiali dei brand con cui lavoriamo, per unire qualità dei materiali e prezzi accessibili.",
+      "Puoi filtrare per brand, taglia, colore, fascia di prezzo e percentuale di sconto per arrivare subito al prodotto giusto. Se cerchi un capo per la stagione fredda parti da capispalla e maglieria; per il quotidiano dai un'occhiata a t-shirt, felpe e denim.",
+    ],
+  },
+  uomo: {
+    short:
+      "Abbigliamento, calzature e accessori uomo dei migliori brand: capispalla, felpe, polo, denim e sneakers.",
+    long: [
+      "La sezione uomo di MyBrand Italia raccoglie una proposta multibrand molto ampia: giubbotti e piumini, giacche, felpe, maglieria, camicie, polo, t-shirt, jeans e pantaloni, oltre a sneakers, stivaletti e accessori come zaini, cinture e cappelli. Le collezioni arrivano direttamente dai brand e vengono aggiornate con i nuovi arrivi di stagione.",
+      "Usa i filtri per brand, taglia, colore, prezzo e sconto per restringere la ricerca in pochi tap. I capispalla sono il punto di partenza per l'autunno-inverno; per un look quotidiano scegli tra felpe, denim e sneakers.",
+    ],
+  },
+  bambino: {
+    short:
+      "Abbigliamento e calzature bambino e bambina: capispalla, felpe, t-shirt, denim e sneakers dei brand più amati.",
+    long: [
+      "Nella sezione bambino di MyBrand Italia trovi capi pensati per l'uso di tutti i giorni: giubbotti imbottiti, felpe, t-shirt, maglieria, jeans e pantaloni, insieme a sneakers e zainetti. Tessuti resistenti e vestibilità comode, nelle taglie dai più piccoli ai ragazzi.",
+      "Filtra per brand, taglia e colore per trovare rapidamente la misura giusta. Le taglie mostrate nei filtri sono quelle realmente disponibili nella categoria che stai guardando.",
+    ],
+  },
+};
+
+export function categoryCopy(dep: DepartmentSlug, cat?: string): CategoryCopy {
+  const base = depCopy[dep];
+  if (!cat) return base;
+  const label = categoryLabel(dep, cat).toLowerCase();
+  const depLabel = departments.find((d) => d.slug === dep)!.label.toLowerCase();
+  return {
+    short: `${categoryLabel(dep, cat)} ${depLabel}: una selezione multibrand con novità, promozioni e taglie disponibili.`,
+    long: [
+      `In questa categoria trovi ${label} ${depLabel} delle collezioni ufficiali dei brand disponibili su MyBrand Italia. Puoi confrontare modelli, colori e prezzi e vedere subito le varianti colore direttamente dalla scheda di ogni prodotto.`,
+      base.long[1]!,
+    ],
+  };
+}
