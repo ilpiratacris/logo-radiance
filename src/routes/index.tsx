@@ -73,7 +73,7 @@ function Home() {
             height={1080}
             // eslint-disable-next-line react/no-unknown-property
             fetchPriority="high"
-            className="h-[60vh] w-full bg-surface object-contain md:h-[62vh]"
+            className="h-[calc(100svh-7.75rem)] min-h-[560px] w-full object-cover object-top md:h-[calc(100svh-8.5rem)] md:min-h-[620px]"
           />
         </picture>
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 via-foreground/20 to-transparent">
@@ -85,13 +85,13 @@ function Home() {
               {hero.headline}
             </h1>
             <p className="mt-2 max-w-sm text-sm text-background/85 md:text-base">{hero.copy}</p>
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mt-5 grid grid-cols-3 gap-2 md:flex md:flex-wrap">
               {hero.cta.map((c) => (
                 <Link
                   key={c.to}
                   to="/reparto/$slug"
                   params={{ slug: c.to }}
-                  className="flex h-12 min-w-[46%] flex-1 items-center justify-center bg-background px-5 text-sm font-semibold text-foreground md:min-w-0 md:flex-none md:px-6"
+                  className="flex h-12 items-center justify-center bg-background px-2 text-center text-xs font-semibold text-foreground md:flex-none md:px-6 md:text-sm"
                 >
                   {c.label}
                 </Link>
