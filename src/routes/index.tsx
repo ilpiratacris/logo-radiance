@@ -46,9 +46,14 @@ function Home() {
   const promo = campaigns[1]!;
 
   const depProducts = productsByDepartment(dep);
-  const news = [...newArrivals().filter((p) => p.department === dep), ...newArrivals()].slice(0, 10);
-  const best = [...bestSellers().filter((p) => p.department === dep), ...bestSellers()].slice(0, 10);
-  const promoList = [...promoProducts().filter((p) => p.department === dep), ...promoProducts()].slice(0, 10);
+  /** priorità al reparto attivo, senza duplicati */
+  const prioritize = (list: Product[]) => {
+    const ordered = [...list.filter((p) => p.department === dep), ...list.filter((p) => p.department !== dep)];
+    return Array.from(new Map(ordered.map((p) => [p.slug, p])).values()).slice(0, 10);
+  };
+  const news = prioritize(newArrivals());
+  const best = prioritize(bestSellers());
+  const promoList = prioritize(promoProducts());
 
   const shopByCategory = navTree[dep][0]!.items.slice(0, 3)
     .concat(navTree[dep][1]!.items.slice(0, 2))
