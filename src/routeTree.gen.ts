@@ -9,10 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as CarrelloRouteImport } from './routes/carrello'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdottoSlugRouteImport } from './routes/prodotto.$slug'
 import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarrelloRoute = CarrelloRouteImport.update({
+  id: '/carrello',
+  path: '/carrello',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +49,88 @@ const CategoriaSlugRoute = CategoriaSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/carrello': typeof CarrelloRoute
+  '/wishlist': typeof WishlistRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/carrello': typeof CarrelloRoute
+  '/wishlist': typeof WishlistRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/carrello': typeof CarrelloRoute
+  '/wishlist': typeof WishlistRoute
   '/categoria/$slug': typeof CategoriaSlugRoute
   '/prodotto/$slug': typeof ProdottoSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/categoria/$slug' | '/prodotto/$slug'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/carrello'
+    | '/wishlist'
+    | '/categoria/$slug'
+    | '/prodotto/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/categoria/$slug' | '/prodotto/$slug'
-  id: '__root__' | '/' | '/categoria/$slug' | '/prodotto/$slug'
+  to:
+    | '/'
+    | '/account'
+    | '/carrello'
+    | '/wishlist'
+    | '/categoria/$slug'
+    | '/prodotto/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/carrello'
+    | '/wishlist'
+    | '/categoria/$slug'
+    | '/prodotto/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  CarrelloRoute: typeof CarrelloRoute
+  WishlistRoute: typeof WishlistRoute
   CategoriaSlugRoute: typeof CategoriaSlugRoute
   ProdottoSlugRoute: typeof ProdottoSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carrello': {
+      id: '/carrello'
+      path: '/carrello'
+      fullPath: '/carrello'
+      preLoaderRoute: typeof CarrelloRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +157,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  CarrelloRoute: CarrelloRoute,
+  WishlistRoute: WishlistRoute,
   CategoriaSlugRoute: CategoriaSlugRoute,
   ProdottoSlugRoute: ProdottoSlugRoute,
 }
