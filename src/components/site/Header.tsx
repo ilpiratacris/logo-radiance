@@ -16,14 +16,13 @@ export function Header() {
   const groups = navTree[department];
   const quickCats = [
     ...(groups[0]?.items.slice(0, 4) ?? []),
-    ...(groups[1]?.items.slice(0, 1) ?? []),
   ];
-  const secondRow: { key: MegaKey | "novita" | `cat:${string}`; label: string }[] = [
+  const secondRow: { key: MegaKey | "novita" | `cat:${string}`; label: string; accent?: boolean }[] = [
     { key: "novita", label: "Novità" },
     ...groups.map((g) => ({ key: g.slug as MegaKey, label: g.label })),
     ...quickCats.map((c) => ({ key: `cat:${c.slug}` as const, label: c.label })),
     { key: "brand", label: "Brand" },
-    { key: "promo", label: "Promo" },
+    { key: "cat:outfit", label: "Outfit", accent: true },
   ];
 
   return (
@@ -151,7 +150,10 @@ export function Header() {
                       params={{ slug: department }}
                       search={isNew ? { novita: "1" } : { cat }}
                       onClick={() => setMega(null)}
-                      className="flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] hover:underline"
+                      onMouseEnter={() => setMega(null)}
+                      className={`flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] hover:underline ${
+                        item.accent ? "text-[color:var(--color-sale)]" : ""
+                      }`}
                     >
                       {item.label}
                     </Link>
@@ -160,11 +162,11 @@ export function Header() {
                 return (
                   <button
                     key={item.key}
-                    onClick={() => setMega(mega === item.key ? null : (item.key as MegaKey))}
+                    onMouseEnter={() => setMega(item.key as MegaKey)}
                     aria-expanded={mega === item.key}
                     className={`flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] ${
-                      item.key === "promo" ? "text-[color:var(--color-sale)]" : ""
-                    } ${mega === item.key ? "underline underline-offset-[10px]" : ""}`}
+                      mega === item.key ? "underline underline-offset-[10px]" : ""
+                    }`}
                   >
                     {item.label}
                   </button>
