@@ -85,14 +85,14 @@ function Home() {
               {hero.headline}
             </h1>
             <p className="mt-2 max-w-sm text-sm text-background/85 md:text-base">{hero.copy}</p>
-            <div className="mt-5 flex gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               {hero.cta.map((c) => (
                 <Link
                   key={c.to}
                   to="/categoria/$slug"
                   params={{ slug: c.to }}
                   search={{ novita: "1" }}
-                  className="flex h-12 flex-1 items-center justify-center bg-background px-6 text-sm font-semibold text-foreground md:flex-none"
+                  className="flex h-12 min-w-[46%] flex-1 items-center justify-center bg-background px-5 text-sm font-semibold text-foreground md:min-w-0 md:flex-none md:px-6"
                 >
                   {c.label}
                 </Link>

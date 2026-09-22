@@ -12,9 +12,16 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mega, setMega] = useState<MegaKey | null>(null);
 
-  const secondRow: { key: MegaKey | "novita"; label: string }[] = [
+  /** Barra secondaria: stesse voci del menu completo del reparto attivo. */
+  const groups = navTree[department];
+  const quickCats = [
+    ...(groups[0]?.items.slice(0, 4) ?? []),
+    ...(groups[1]?.items.slice(0, 1) ?? []),
+  ];
+  const secondRow: { key: MegaKey | "novita" | `cat:${string}`; label: string }[] = [
     { key: "novita", label: "Novità" },
-    ...navTree[department].map((g) => ({ key: g.slug as MegaKey, label: g.label })),
+    ...groups.map((g) => ({ key: g.slug as MegaKey, label: g.label })),
+    ...quickCats.map((c) => ({ key: `cat:${c.slug}` as const, label: c.label })),
     { key: "brand", label: "Brand" },
     { key: "promo", label: "Promo" },
   ];
@@ -92,8 +99,10 @@ export function Header() {
                     key={d.slug}
                     to="/categoria/$slug"
                     params={{ slug: d.slug }}
-                    onClick={() => setDepartment(d.slug)}
-                    onMouseEnter={() => setDepartment(d.slug)}
+                    onClick={() => {
+                      setDepartment(d.slug);
+                      setMega(null);
+                    }}
                     className={`flex items-center px-4 text-sm font-semibold uppercase tracking-[0.12em] ${
                       department === d.slug
                         ? "border-b-2 border-foreground text-foreground"
@@ -130,34 +139,37 @@ export function Header() {
           </div>
 
           <div className="border-b border-border">
-            <div className="container-mb flex h-11 items-stretch gap-7">
-              {secondRow.map((item) =>
-                item.key === "novita" ? (
-                  <Link
-                    key="novita"
-                    to="/categoria/$slug"
-                    params={{ slug: department }}
-                    search={{ novita: "1" }}
-                    onMouseEnter={() => setMega(null)}
-                    className="flex items-center text-[13px] font-medium uppercase tracking-[0.08em] hover:underline"
-                  >
-                    Novità
-                  </Link>
-                ) : (
+            <div className="container-mb flex h-11 items-stretch gap-5 xl:gap-7">
+              {secondRow.map((item) => {
+                if (item.key === "novita" || String(item.key).startsWith("cat:")) {
+                  const isNew = item.key === "novita";
+                  const cat = String(item.key).slice(4);
+                  return (
+                    <Link
+                      key={item.key}
+                      to="/categoria/$slug"
+                      params={{ slug: department }}
+                      search={isNew ? { novita: "1" } : { cat }}
+                      onClick={() => setMega(null)}
+                      className="flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] hover:underline"
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                }
+                return (
                   <button
                     key={item.key}
-                    onMouseEnter={() => setMega(item.key as MegaKey)}
-                    onFocus={() => setMega(item.key as MegaKey)}
                     onClick={() => setMega(mega === item.key ? null : (item.key as MegaKey))}
                     aria-expanded={mega === item.key}
-                    className={`flex items-center text-[13px] font-medium uppercase tracking-[0.08em] ${
+                    className={`flex items-center whitespace-nowrap text-[13px] font-medium uppercase tracking-[0.08em] ${
                       item.key === "promo" ? "text-[color:var(--color-sale)]" : ""
                     } ${mega === item.key ? "underline underline-offset-[10px]" : ""}`}
                   >
                     {item.label}
                   </button>
-                ),
-              )}
+                );
+              })}
             </div>
           </div>
 

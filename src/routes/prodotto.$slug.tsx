@@ -5,6 +5,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { SizeGuide } from "@/components/site/SizeGuide";
+import { BrandMark } from "@/components/site/BrandMark";
 import {
   brandSlug,
   discountOf,
@@ -201,14 +202,17 @@ function ProductPage() {
 
         {/* INFO */}
         <div className="lg:pt-2">
-          <Link
-            to="/brand/$slug"
-            params={{ slug: brandSlug(product.brand) }}
-            className="text-xs font-semibold uppercase tracking-[0.14em] underline-offset-4 hover:underline"
-          >
-            {product.brand}
-          </Link>
-          <h1 className="mt-1 text-xl font-medium md:text-2xl">{product.name}</h1>
+          <div className="flex items-center gap-3">
+            <BrandMark brand={product.brand} />
+            <Link
+              to="/brand/$slug"
+              params={{ slug: brandSlug(product.brand) }}
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Vedi tutto {product.brand}
+            </Link>
+          </div>
+          <h1 className="mt-2 text-xl font-medium md:text-2xl">{product.name}</h1>
 
           <div className="mt-3 flex items-baseline gap-2">
             <span className={`text-2xl font-semibold ${discount ? "text-[color:var(--color-sale)]" : ""}`}>
