@@ -12,9 +12,16 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mega, setMega] = useState<MegaKey | null>(null);
 
-  const secondRow: { key: MegaKey | "novita"; label: string }[] = [
+  /** Barra secondaria: stesse voci del menu completo del reparto attivo. */
+  const groups = navTree[department];
+  const quickCats = [
+    ...(groups[0]?.items.slice(0, 4) ?? []),
+    ...(groups[1]?.items.slice(0, 1) ?? []),
+  ];
+  const secondRow: { key: MegaKey | "novita" | `cat:${string}`; label: string }[] = [
     { key: "novita", label: "Novità" },
-    ...navTree[department].map((g) => ({ key: g.slug as MegaKey, label: g.label })),
+    ...groups.map((g) => ({ key: g.slug as MegaKey, label: g.label })),
+    ...quickCats.map((c) => ({ key: `cat:${c.slug}` as const, label: c.label })),
     { key: "brand", label: "Brand" },
     { key: "promo", label: "Promo" },
   ];
@@ -92,8 +99,10 @@ export function Header() {
                     key={d.slug}
                     to="/categoria/$slug"
                     params={{ slug: d.slug }}
-                    onClick={() => setDepartment(d.slug)}
-                    onMouseEnter={() => setDepartment(d.slug)}
+                    onClick={() => {
+                      setDepartment(d.slug);
+                      setMega(null);
+                    }}
                     className={`flex items-center px-4 text-sm font-semibold uppercase tracking-[0.12em] ${
                       department === d.slug
                         ? "border-b-2 border-foreground text-foreground"
