@@ -87,8 +87,8 @@ function DepartmentHome() {
   );
 
   const promoBlock = (
-    <section className="py-8 md:py-12">
-      <Link to="/promo/$slug" params={{ slug: promo.slug }} className="group relative block overflow-hidden">
+    <section className="bg-brand-red py-8 md:py-12">
+      <div className="container-mb"><Link to="/promo/$slug" params={{ slug: promo.slug }} className="group relative block overflow-hidden">
         <img
           src={promo.image}
           alt={promo.headline}
@@ -107,55 +107,48 @@ function DepartmentHome() {
             Scopri la promo
           </span>
         </div>
-      </Link>
+      </Link></div>
     </section>
   );
+
+  const heroTone = dep === "donna" ? "bg-brand-pink" : dep === "uomo" ? "bg-foreground text-background" : "bg-brand-yellow";
 
   return (
     <SiteLayout>
       {/* HERO REPARTO */}
-      <section className="relative">
-        <img
-          src={image}
-          alt={label}
-          width={1200}
-          height={900}
-          // eslint-disable-next-line react/no-unknown-property
-          fetchPriority="high"
-          className="h-[46vh] w-full bg-surface object-contain md:h-[52vh]"
-        />
-        <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 via-foreground/20 to-transparent">
-          <div className="container-mb pb-6 md:pb-10">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-background/90">
-              Reparto
-            </span>
-            <h1 className="mt-1 text-3xl font-semibold leading-[1.05] tracking-tight text-background md:text-5xl">
-              {label}
-            </h1>
-            <p className="mt-2 max-w-md text-sm text-background/85">{copy.short}</p>
-            <div className="mt-5 flex flex-wrap gap-2">
+      <section className={`${heroTone} overflow-hidden`}>
+        <div className="container-mb grid min-h-[520px] items-stretch md:grid-cols-12">
+          <div className="flex flex-col justify-center py-10 md:col-span-5 md:py-16">
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] opacity-70">Nuova stagione · Reparto</span>
+            <h1 className="mt-3 text-5xl font-extrabold uppercase leading-none md:text-7xl">{label}</h1>
+            <p className="mt-4 max-w-md text-base font-medium opacity-80">{copy.short}</p>
+            <div className="mt-7 flex flex-wrap gap-2">
               <Link
                 to="/categoria/$slug"
                 params={{ slug: dep }}
                 search={{ novita: "1" }}
-                className="flex h-12 min-w-[46%] flex-1 items-center justify-center bg-background px-5 text-sm font-semibold text-foreground md:min-w-0 md:flex-none md:px-6"
+                className="flex h-12 min-w-[46%] flex-1 items-center justify-center bg-foreground px-5 text-sm font-bold text-background md:min-w-0 md:flex-none md:px-6"
               >
                 Novità {label}
               </Link>
               <Link
                 to="/categoria/$slug"
                 params={{ slug: dep }}
-                className="flex h-12 min-w-[46%] flex-1 items-center justify-center border border-background px-5 text-sm font-semibold text-background md:min-w-0 md:flex-none md:px-6"
+                className="flex h-12 min-w-[46%] flex-1 items-center justify-center border-2 border-current px-5 text-sm font-bold md:min-w-0 md:flex-none md:px-6"
               >
                 Tutto il reparto
               </Link>
             </div>
           </div>
+          <div className="relative min-h-[340px] md:col-span-7 md:min-h-[520px]">
+            <img src={image} alt={label} width={1200} height={900} fetchPriority="high" className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 hover:scale-[1.025]" />
+            <span className="absolute bottom-3 right-3 text-5xl font-extrabold uppercase opacity-10 md:text-8xl">MyBrand</span>
+          </div>
         </div>
       </section>
 
       {/* Accessi rapidi comuni, contenuti e gerarchia restano specifici per reparto */}
-      <section className="border-b border-border">
+      <section className="border-b-4 border-foreground bg-background">
         <div className="container-mb flex gap-2 overflow-x-auto py-3 [-ms-overflow-style:none] [scrollbar-width:none] md:flex-wrap md:overflow-visible">
           {quickCats.map((c) => (
             <Link
@@ -163,7 +156,7 @@ function DepartmentHome() {
               to="/categoria/$slug"
               params={{ slug: dep }}
               search={{ cat: c.slug }}
-              className="flex h-10 shrink-0 items-center border border-border-strong px-4 text-xs font-medium uppercase tracking-[0.06em] hover:border-foreground"
+              className="flex h-11 shrink-0 items-center border-2 border-foreground px-4 text-xs font-bold uppercase tracking-[0.06em] hover:bg-foreground hover:text-background"
             >
               {c.label}
             </Link>
@@ -173,7 +166,7 @@ function DepartmentHome() {
 
       {dep === "donna" && (
         <>
-          <section className="bg-surface py-8 md:py-12">
+          <section className="bg-brand-pink py-8 md:py-12">
             <div className="container-mb">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Ispirazione donna</p>
               <h2 className="mt-1 text-xl font-semibold md:text-3xl">Costruisci il tuo look</h2>
@@ -187,8 +180,8 @@ function DepartmentHome() {
               </div>
             </div>
           </section>
-          <div className="bg-background"><ProductCarousel eyebrow="Nuova stagione" title="Novità Donna" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
-          <section className="bg-foreground py-10 text-background md:py-14">
+           <div className="border-y-8 border-brand-red bg-background"><ProductCarousel eyebrow="Nuova stagione" title="Novità Donna" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
+           <section className="bg-brand-red py-10 text-background md:py-14">
             <div className="container-mb grid items-center gap-6 md:grid-cols-[1.25fr_.75fr]">
               <img src={editorialImage} alt="Ispirazione outfit donna" width={1600} height={1000} loading="lazy" className="aspect-[4/3] w-full object-contain" />
               <div><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-background/70">Outfit del momento</p><h2 className="mt-2 text-2xl font-semibold md:text-4xl">Nuovi equilibri, nuovi abbinamenti</h2><p className="mt-3 text-sm text-background/80">Capi e accessori da combinare per la nuova stagione.</p>{categoryLink("giacche", "Scopri la selezione", "mt-5 inline-flex h-12 items-center bg-background px-6 text-sm font-semibold text-foreground")}</div>
@@ -202,13 +195,13 @@ function DepartmentHome() {
 
       {dep === "uomo" && (
         <>
-          <section className="bg-surface py-9 md:py-14">
+          <section className="bg-foreground py-9 text-background md:py-14">
             <div className="container-mb">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Trova subito quello che cerchi</p>
             <h2 className="mt-1 text-xl font-semibold md:text-3xl">Categorie Uomo</h2>
             <div className="mt-5 grid gap-px bg-border md:grid-cols-3">
               {groups.map((group) => (
-                <div key={group.slug} className="bg-background p-5 md:p-7">
+                <div key={group.slug} className="bg-background p-5 text-foreground md:p-7">
                   <h3 className="text-base font-semibold uppercase">{group.label}</h3>
                   <div className="mt-3 grid grid-cols-2 gap-x-4">
                     {group.items.slice(0, 8).map((item) => categoryLink(item.slug, item.label, "flex min-h-11 items-center border-b border-border text-sm hover:underline"))}
@@ -217,7 +210,7 @@ function DepartmentHome() {
               ))}
             </div></div>
           </section>
-          <div className="bg-background"><ProductCarousel eyebrow="I più scelti" title="Best seller Uomo" products={pick(bestSellers())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
+          <div className="border-y-8 border-brand-blue bg-background"><ProductCarousel eyebrow="I più scelti" title="Best seller Uomo" products={pick(bestSellers())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
           <BrandCarousel />
           <div className="bg-surface"><ProductCarousel eyebrow="Appena arrivati" title="Novità Uomo" products={pick(newArrivals())} /></div>
           {promoBlock}
@@ -227,14 +220,14 @@ function DepartmentHome() {
 
       {dep === "bambino" && (
         <>
-          <section className="bg-surface py-9 md:py-14">
+          <section className="bg-brand-yellow py-9 md:py-14">
             <div className="container-mb">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Per ogni giornata</p>
               <h2 className="mt-1 text-xl font-semibold md:text-3xl">Vestirsi diventa facile</h2>
               <div className="mt-5 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-4">
                 {[{ label: "Scuola", slug: "felpe" }, { label: "Tempo libero", slug: "t-shirt" }, { label: "Primi freddi", slug: "giubbotti" }, { label: "Ogni giorno", slug: "sneakers" }].map((item) => (
-                  <Link key={item.label} to="/categoria/$slug" params={{ slug: dep }} search={{ cat: item.slug }} className="bg-background p-3 md:p-4">
-                    <img src={categoryImage(item.slug)} alt={item.label} width={500} height={600} className="aspect-square w-full object-contain" />
+                   <Link key={item.label} to="/categoria/$slug" params={{ slug: dep }} search={{ cat: item.slug }} className="group bg-background p-3 md:p-4">
+                     <img src={categoryImage(item.slug)} alt={item.label} width={500} height={600} className="aspect-square w-full object-contain transition-transform duration-500 group-hover:scale-[1.04]" />
                     <span className="mt-3 block text-center text-sm font-semibold uppercase">{item.label}</span>
                   </Link>
                 ))}
@@ -242,7 +235,7 @@ function DepartmentHome() {
             </div>
           </section>
           <div className="bg-background"><ProductCarousel eyebrow="Per i più piccoli" title="Novità Bambino" products={pick(newArrivals())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
-          <section className="bg-foreground py-8 text-background md:py-12">
+           <section className="bg-brand-red py-8 text-background md:py-12">
             <div className="container-mb grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
               {shopByCategory.map((category) => (
                 <Link key={category.slug} to="/categoria/$slug" params={{ slug: dep }} search={{ cat: category.slug }} className="bg-background p-3 text-foreground">

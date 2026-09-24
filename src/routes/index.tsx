@@ -101,31 +101,37 @@ function Home() {
         </div>
       </section>
 
-      {/* ACCESSO RAPIDO AI REPARTI */}
-      <section className="bg-surface py-6">
-        <div className="container-mb">
-        <div className="grid grid-cols-3 gap-2 md:gap-4">
-          {departments.map((d) => (
-            <Link key={d.slug} to="/reparto/$slug" params={{ slug: d.slug }} className="group block">
-              <img
-                src={d.image}
-                alt={d.label}
-                width={600}
-                height={750}
-                loading="lazy"
-                className="aspect-[4/5] w-full bg-surface object-contain md:aspect-[3/4]"
-              />
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-semibold uppercase tracking-[0.08em]">{d.label}</span>
-                <ArrowRight className="h-4 w-4 opacity-60" strokeWidth={1.5} />
+      {/* ACCESSO RAPIDO AI REPARTI — griglia cromatica dinamica */}
+      <section className="bg-surface py-5 md:py-10">
+        <div className="container-mb grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">
+          {departments.map((d, index) => (
+            <Link
+              key={d.slug}
+              to="/reparto/$slug"
+              params={{ slug: d.slug }}
+              className={`group relative overflow-hidden ${index === 0 ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
+            >
+              <div className={index === 0 ? "bg-brand-pink" : index === 1 ? "bg-foreground" : "bg-brand-yellow"}>
+                <img
+                  src={d.image}
+                  alt={d.label}
+                  width={800}
+                  height={900}
+                  loading="lazy"
+                  className={`w-full object-contain transition-transform duration-500 group-hover:scale-[1.025] ${index === 0 ? "aspect-[5/4] md:aspect-[4/3]" : "aspect-[4/3] md:aspect-[2/1]"}`}
+                />
+              </div>
+              <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-6 ${index === 1 ? "text-background" : "text-foreground"}`}>
+                <div><span className="text-[11px] font-bold uppercase tracking-[0.16em]">Esplora</span><h2 className="mt-1 text-2xl font-extrabold uppercase md:text-4xl">{d.label}</h2></div>
+                <span className={`flex h-11 w-11 items-center justify-center rounded-full ${index === 1 ? "bg-background text-foreground" : "bg-foreground text-background"}`}><ArrowRight className="h-5 w-5" /></span>
               </div>
             </Link>
           ))}
-        </div></div>
+        </div>
       </section>
 
       {/* NOVITÀ */}
-      <div className="bg-background"><ProductCarousel
+      <div className="border-y-8 border-brand-red bg-background"><ProductCarousel
         eyebrow="Appena arrivati"
         title={`Novità ${depLabel}`}
         products={news}
@@ -134,7 +140,7 @@ function Home() {
       /></div>
 
       {/* SHOP BY CATEGORY */}
-      <section className="bg-surface py-8 md:py-12">
+      <section className="bg-brand-yellow py-8 md:py-12">
         <div className="container-mb">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Scopri per categoria
@@ -170,7 +176,7 @@ function Home() {
       </section>
 
       {/* BRAND */}
-      <BrandCarousel />
+      <div className="border-t-8 border-foreground"><BrandCarousel /></div>
 
       {/* BEST SELLER */}
       <div className="bg-background"><ProductCarousel
@@ -182,8 +188,8 @@ function Home() {
       /></div>
 
       {/* PROMO ATTIVA */}
-      <section className="container-mb py-8 md:py-12">
-        <Link to="/promo/$slug" params={{ slug: promo.slug }} className="group relative block overflow-hidden">
+      <section className="bg-brand-red py-8 md:py-12">
+        <div className="container-mb"><Link to="/promo/$slug" params={{ slug: promo.slug }} className="group relative block overflow-hidden">
           <img
             src={promo.image}
             alt={promo.headline}
@@ -204,13 +210,13 @@ function Home() {
               Scopri la promo
             </span>
           </div>
-        </Link>
+        </Link></div>
       </section>
 
       <div className="bg-surface"><ProductCarousel eyebrow="In promozione" title="Prezzi ridotti" products={promoList} /></div>
 
       {/* EDITORIALE */}
-      <section className="bg-foreground py-10 md:py-14">
+      <section className="border-y-8 border-brand-yellow bg-foreground py-10 md:py-14">
         <div className="container-mb grid items-center gap-6 md:grid-cols-2">
           <img
             src={editorialImage}
