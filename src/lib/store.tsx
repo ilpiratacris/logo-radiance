@@ -62,7 +62,7 @@ type Persisted = {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
-  const [department, setDepartmentState] = useState<DepartmentSlug>("donna");
+  const [department, setDepartmentState] = useState<DepartmentSlug>("uomo");
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
   const [cart, setCart] = useState<CartLine[]>([]);
