@@ -173,7 +173,7 @@ function ProductPage() {
                   mainIdx === i ? "border-foreground" : "border-border"
                 }`}
               >
-                <img src={g} alt="" width={64} height={80} className="h-full w-full object-cover" />
+                <img src={g} alt="" width={64} height={80} className="h-full w-full bg-background object-contain" />
               </button>
             ))}
           </div>
@@ -187,7 +187,7 @@ function ProductPage() {
                 width={900}
                 height={1200}
                 loading={i === 0 ? "eager" : "lazy"}
-                className={`w-[86%] shrink-0 snap-center bg-surface object-cover lg:w-full lg:max-h-[700px] ${
+                className={`w-[86%] shrink-0 snap-center bg-background object-contain lg:w-full lg:max-h-[700px] ${
                   i === mainIdx ? "lg:block" : "lg:hidden"
                 }`}
               />
@@ -242,7 +242,7 @@ function ProductPage() {
                     i === vi ? "border-foreground" : "border-transparent"
                   }`}
                 >
-                  <img src={v.image} alt={v.label} width={56} height={64} className="h-full w-full object-cover" />
+                  <img src={v.image} alt={v.label} width={56} height={64} className="h-full w-full bg-background object-contain" />
                 </button>
               ))}
             </div>
@@ -359,7 +359,7 @@ function ProductPage() {
         style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}
       >
         <div className="flex items-center gap-3 px-4 py-2.5">
-          <img src={variant.image} alt="" width={40} height={52} className="h-[52px] w-10 object-cover" />
+          <img src={variant.image} alt="" width={40} height={52} className="h-[52px] w-10 bg-background object-contain" />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[11px] font-semibold uppercase tracking-[0.08em]">{product.brand}</div>
             <div className="text-sm font-semibold">{formatPrice(product.price)}</div>

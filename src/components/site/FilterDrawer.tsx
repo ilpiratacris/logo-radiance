@@ -40,7 +40,7 @@ export function FilterSections({
   facets,
   value,
   onChange,
-  defaultOpen = "all",
+  defaultOpen,
   desktopGrid = false,
 }: {
   facets: Facets;
@@ -50,7 +50,9 @@ export function FilterSections({
   desktopGrid?: boolean;
 }) {
   const sectionIds = ["cat", "brand", "size", "color", "price", "promo"];
-  const [openSections, setOpenSections] = useState<string[]>(defaultOpen === "all" ? sectionIds : [defaultOpen]);
+  const [openSections, setOpenSections] = useState<string[]>(
+    defaultOpen === "all" ? sectionIds : defaultOpen ? [defaultOpen] : [],
+  );
   const [brandQuery, setBrandQuery] = useState("");
   const [showAllBrands, setShowAllBrands] = useState(false);
 
