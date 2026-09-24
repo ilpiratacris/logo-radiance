@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/mybrand-logo.avif.asset.json";
@@ -8,6 +8,7 @@ import { MegaMenu, type MegaKey } from "@/components/site/MegaMenu";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
 export function Header() {
+  const isHome = useLocation().pathname === "/";
   const { department, setDepartment, cartCount, wishlist, setSearchOpen, openCart, hydrated } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mega, setMega] = useState<MegaKey | null>(null);
@@ -64,8 +65,8 @@ export function Header() {
             </div>
           </div>
 
-          {/* tab reparti sempre visibili su mobile */}
-          <div className="grid grid-cols-3 border-t border-border">
+          {/* La home lascia la scelta del reparto ai contenuti principali. */}
+          {!isHome && <div className="grid grid-cols-3 border-t border-border">
             {departments.map((d) => (
               <Link
                 key={d.slug}
@@ -81,7 +82,7 @@ export function Header() {
                 {d.label}
               </Link>
             ))}
-          </div>
+          </div>}
         </div>
 
         {/* ---------- DESKTOP ---------- */}
@@ -103,7 +104,7 @@ export function Header() {
                       setMega(null);
                     }}
                     className={`flex items-center px-4 text-[15px] font-bold uppercase tracking-[0.12em] ${
-                      department === d.slug
+                      !isHome && department === d.slug
                         ? "border-b-2 border-foreground text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
@@ -137,7 +138,7 @@ export function Header() {
             </div>
           </div>
 
-          <div className="border-b border-border">
+          {!isHome && <div className="border-b border-border">
             <div className="container-mb flex h-11 items-stretch gap-5 xl:gap-7">
               {secondRow.map((item) => {
                 if (item.key === "novita" || String(item.key).startsWith("cat:")) {
@@ -173,9 +174,9 @@ export function Header() {
                 );
               })}
             </div>
-          </div>
+          </div>}
 
-          {mega && (
+          {!isHome && mega && (
             <div className="absolute inset-x-0 top-full">
               <MegaMenu active={mega} department={department} onNavigate={() => setMega(null)} />
             </div>
