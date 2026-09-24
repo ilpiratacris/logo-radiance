@@ -40,7 +40,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { department, hydrated } = useStore();
-  const dep: DepartmentSlug = hydrated ? department : "donna";
+  const dep: DepartmentSlug = hydrated ? department : "uomo";
   const depLabel = departments.find((d) => d.slug === dep)!.label;
 
   const hero = campaigns[0]!;
@@ -86,7 +86,7 @@ function Home() {
             </h1>
             <p className="mt-2 max-w-sm text-sm text-background/85 md:text-base">{hero.copy}</p>
             <div className="mt-5 grid grid-cols-3 gap-2 md:flex md:flex-wrap">
-              {hero.cta.map((c) => (
+              {[...hero.cta].sort((a, b) => Number(b.to === "uomo") - Number(a.to === "uomo")).map((c) => (
                 <Link
                   key={c.to}
                   to="/reparto/$slug"
@@ -104,26 +104,26 @@ function Home() {
       {/* ACCESSO RAPIDO AI REPARTI — griglia cromatica dinamica */}
       <section className="bg-surface py-5 md:py-10">
         <div className="container-mb grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">
-          {departments.map((d, index) => (
+          {[...departments].sort((a, b) => Number(b.slug === "uomo") - Number(a.slug === "uomo")).map((d) => (
             <Link
               key={d.slug}
               to="/reparto/$slug"
               params={{ slug: d.slug }}
-              className={`group relative overflow-hidden ${index === 0 ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
+              className={`group relative overflow-hidden ${d.slug === "uomo" ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
             >
-              <div className={index === 0 ? "bg-brand-pink" : index === 1 ? "bg-foreground" : "bg-brand-yellow"}>
+              <div className={d.slug === "uomo" ? "bg-foreground" : d.slug === "donna" ? "bg-brand-pink" : "bg-brand-yellow"}>
                 <img
                   src={d.image}
                   alt={d.label}
                   width={800}
                   height={900}
                   loading="lazy"
-                  className={`w-full object-contain transition-transform duration-500 group-hover:scale-[1.025] ${index === 0 ? "aspect-[5/4] md:aspect-[4/3]" : "aspect-[4/3] md:aspect-[2/1]"}`}
+                  className={`w-full object-contain transition-transform duration-500 group-hover:scale-[1.025] ${d.slug === "uomo" ? "aspect-[5/4] md:aspect-[4/3]" : "aspect-[4/3] md:aspect-[2/1]"}`}
                 />
               </div>
-              <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-6 ${index === 1 ? "text-background" : "text-foreground"}`}>
+              <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-6 ${d.slug === "uomo" ? "text-background" : "text-foreground"}`}>
                 <div><span className="text-[11px] font-bold uppercase tracking-[0.16em]">Esplora</span><h2 className="mt-1 text-2xl font-extrabold uppercase md:text-4xl">{d.label}</h2></div>
-                <span className={`flex h-11 w-11 items-center justify-center rounded-full ${index === 1 ? "bg-background text-foreground" : "bg-foreground text-background"}`}><ArrowRight className="h-5 w-5" /></span>
+                <span className={`flex h-11 w-11 items-center justify-center rounded-full ${d.slug === "uomo" ? "bg-background text-foreground" : "bg-foreground text-background"}`}><ArrowRight className="h-5 w-5" /></span>
               </div>
             </Link>
           ))}
