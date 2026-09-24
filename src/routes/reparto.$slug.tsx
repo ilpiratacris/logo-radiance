@@ -49,7 +49,7 @@ export const Route = createFileRoute("/reparto/$slug")({
 });
 
 function DepartmentHome() {
-  const { dep, label, image } = Route.useLoaderData();
+  const { dep, label } = Route.useLoaderData();
   const { setDepartment } = useStore();
 
   useEffect(() => {
