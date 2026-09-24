@@ -7,7 +7,7 @@ export function BrandCarousel() {
   const others = brands.filter((b) => !b.featured);
 
   return (
-    <section className="bg-surface py-10 md:py-14">
+    <section className="bg-brand-pink py-10 md:py-14">
       <div className="container-mb flex items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -27,7 +27,7 @@ export function BrandCarousel() {
             key={b.slug}
             to="/brand/$slug"
             params={{ slug: b.slug }}
-            className="flex min-h-[88px] flex-col justify-center border border-border bg-background px-4 py-3 transition-colors hover:border-foreground"
+            className="flex min-h-[88px] flex-col justify-center border-2 border-foreground bg-background px-4 py-3 transition-colors hover:bg-foreground hover:text-background"
           >
             <span className="text-sm font-semibold uppercase tracking-[0.16em]">{b.name}</span>
             {b.claim && <span className="mt-1 text-[11px] text-muted-foreground">{b.claim}</span>}
