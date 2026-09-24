@@ -4,6 +4,9 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { BrandCarousel } from "@/components/site/BrandCarousel";
 import { TrustBar } from "@/components/site/TrustBar";
+import departmentUomoWide from "@/assets/department-uomo-wide.jpg";
+import departmentDonnaWide from "@/assets/department-donna-wide.jpg";
+import departmentBambinoWide from "@/assets/department-bambino-wide.jpg";
 import {
   bestSellers,
   campaigns,
@@ -111,7 +114,8 @@ function DepartmentHome() {
     </section>
   );
 
-  const heroTone = dep === "donna" ? "bg-brand-pink" : dep === "uomo" ? "bg-foreground text-background" : "bg-brand-yellow";
+  const heroTone = dep === "uomo" ? "bg-foreground text-background" : dep === "donna" ? "bg-brand-red text-background" : "bg-background";
+  const heroImage = dep === "uomo" ? departmentUomoWide : dep === "donna" ? departmentDonnaWide : departmentBambinoWide;
 
   return (
     <SiteLayout>
@@ -141,7 +145,7 @@ function DepartmentHome() {
             </div>
           </div>
           <div className="relative min-h-[340px] md:col-span-7 md:min-h-[520px]">
-            <img src={image} alt={label} width={1200} height={900} fetchPriority="high" className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 hover:scale-[1.025]" />
+             <img src={heroImage} alt={label} width={1200} height={688} fetchPriority="high" className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 hover:scale-[1.025]" />
             <span className="absolute bottom-3 right-3 text-5xl font-extrabold uppercase opacity-10 md:text-8xl">MyBrand</span>
           </div>
         </div>
@@ -166,7 +170,7 @@ function DepartmentHome() {
 
       {dep === "donna" && (
         <>
-          <section className="bg-brand-pink py-8 md:py-12">
+          <section className="bg-background py-8 md:py-12">
             <div className="container-mb">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Ispirazione donna</p>
               <h2 className="mt-1 text-xl font-semibold md:text-3xl">Costruisci il tuo look</h2>
@@ -210,7 +214,7 @@ function DepartmentHome() {
               ))}
             </div></div>
           </section>
-          <div className="border-y-8 border-brand-blue bg-background"><ProductCarousel eyebrow="I più scelti" title="Best seller Uomo" products={pick(bestSellers())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
+          <div className="border-y-8 border-brand-red bg-background"><ProductCarousel eyebrow="I più scelti" title="Best seller Uomo" products={pick(bestSellers())} to="/categoria/$slug" toParams={{ slug: dep }} /></div>
           <BrandCarousel />
           <div className="bg-surface"><ProductCarousel eyebrow="Appena arrivati" title="Novità Uomo" products={pick(newArrivals())} /></div>
           {promoBlock}
@@ -220,7 +224,7 @@ function DepartmentHome() {
 
       {dep === "bambino" && (
         <>
-          <section className="bg-brand-yellow py-9 md:py-14">
+          <section className="bg-foreground py-9 text-background md:py-14">
             <div className="container-mb">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Per ogni giornata</p>
               <h2 className="mt-1 text-xl font-semibold md:text-3xl">Vestirsi diventa facile</h2>

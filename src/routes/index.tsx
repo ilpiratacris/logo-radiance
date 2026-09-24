@@ -5,6 +5,9 @@ import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { BrandCarousel } from "@/components/site/BrandCarousel";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
+import departmentUomoWide from "@/assets/department-uomo-wide.jpg";
+import departmentDonnaWide from "@/assets/department-donna-wide.jpg";
+import departmentBambinoWide from "@/assets/department-bambino-wide.jpg";
 import {
   bestSellers,
   campaigns,
@@ -46,6 +49,11 @@ function Home() {
   const news = prioritize(newArrivals());
   const best = prioritize(bestSellers());
   const promoList = prioritize(promoProducts());
+  const departmentImages = {
+    uomo: departmentUomoWide,
+    donna: departmentDonnaWide,
+    bambino: departmentBambinoWide,
+  };
 
   return (
     <SiteLayout>
@@ -98,19 +106,19 @@ function Home() {
               params={{ slug: d.slug }}
               className={`group relative overflow-hidden ${d.slug === "uomo" ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
             >
-              <div className={d.slug === "uomo" ? "bg-foreground" : d.slug === "donna" ? "bg-brand-pink" : "bg-brand-yellow"}>
+              <div className={d.slug === "uomo" ? "bg-foreground" : d.slug === "donna" ? "bg-brand-red" : "bg-background"}>
                 <img
-                  src={d.image}
+                  src={departmentImages[d.slug]}
                   alt={d.label}
                   width={800}
                   height={900}
                   loading="lazy"
-                  className={`w-full object-contain transition-transform duration-500 group-hover:scale-[1.025] ${d.slug === "uomo" ? "aspect-[5/4] md:aspect-[4/3]" : "aspect-[4/3] md:aspect-[2/1]"}`}
+                  className={`w-full object-contain transition-transform duration-500 group-hover:scale-[1.025] ${d.slug === "uomo" ? "aspect-[16/9] md:aspect-[4/3]" : "aspect-[16/9]"}`}
                 />
               </div>
-              <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-6 ${d.slug === "uomo" ? "text-background" : "text-foreground"}`}>
+              <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-6 ${d.slug !== "bambino" ? "text-background" : "text-foreground"}`}>
                 <div><span className="text-[11px] font-bold uppercase tracking-[0.16em]">Esplora</span><h2 className="mt-1 text-2xl font-extrabold uppercase md:text-4xl">{d.label}</h2></div>
-                <span className={`flex h-11 w-11 items-center justify-center rounded-full ${d.slug === "uomo" ? "bg-background text-foreground" : "bg-foreground text-background"}`}><ArrowRight className="h-5 w-5" /></span>
+                <span className={`flex h-11 w-11 items-center justify-center rounded-full ${d.slug !== "bambino" ? "bg-background text-foreground" : "bg-foreground text-background"}`}><ArrowRight className="h-5 w-5" /></span>
               </div>
             </Link>
           ))}
@@ -163,7 +171,7 @@ function Home() {
       <div className="bg-surface"><ProductCarousel eyebrow="In promozione" title="Prezzi ridotti" products={promoList} /></div>
 
       {/* EDITORIALE */}
-      <section className="border-y-8 border-brand-yellow bg-foreground py-10 md:py-14">
+      <section className="border-y-8 border-brand-red bg-foreground py-10 md:py-14">
         <div className="container-mb grid items-center gap-6 md:grid-cols-2">
           <img
             src={editorialImage}
