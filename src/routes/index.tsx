@@ -96,39 +96,80 @@ function Home() {
         </div>
       </section>
 
-      {/* ACCESSO RAPIDO AI REPARTI — scelta editoriale, neutrale e dinamica */}
-      <section className="bg-brand-red py-8 md:py-14">
-        <div className="container-mb mb-6 flex items-end justify-between gap-5 text-background md:mb-8">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-background/75">Inizia da qui</p>
-            <h2 className="mt-1 max-w-2xl text-3xl font-extrabold uppercase leading-none md:text-5xl">Scegli il tuo mondo</h2>
+      {/* ACCESSO RAPIDO AI REPARTI — griglia editoriale */}
+      <section className="overflow-hidden bg-brand-red py-9 md:py-16">
+        <div className="container-mb">
+          <div className="mb-8 flex flex-col gap-4 text-background md:mb-12 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-background/75">Inizia da qui</p>
+              <h2 className="mt-2 max-w-3xl text-4xl font-extrabold uppercase leading-[0.92] md:text-7xl">
+                Scegli il <span className="text-foreground">tuo</span> mondo
+              </h2>
+            </div>
+            <p className="max-w-sm border-l-4 border-foreground pl-4 text-sm font-medium leading-relaxed text-background/90">
+              Tre selezioni diverse, un solo catalogo multibrand.
+            </p>
           </div>
-          <p className="hidden max-w-xs text-sm text-background/80 md:block">Tre selezioni diverse, un solo catalogo multibrand.</p>
-        </div>
-        <div className="container-mb grid grid-cols-2 gap-2 md:grid-cols-12 md:gap-4">
-          {[...departments].sort((a, b) => Number(b.slug === "uomo") - Number(a.slug === "uomo")).map((d) => (
+
+          <div className="grid gap-5 md:grid-cols-12 md:gap-7">
             <Link
-              key={d.slug}
               to="/reparto/$slug"
-              params={{ slug: d.slug }}
-              className={`group relative overflow-hidden border-4 border-background ${d.slug === "uomo" ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
+              params={{ slug: "uomo" }}
+              className="group relative md:col-span-7"
             >
-              <div className={d.slug === "uomo" ? "bg-foreground" : d.slug === "donna" ? "bg-brand-red" : "bg-background"}>
+              <div className="relative border-[6px] border-foreground bg-background transition-transform duration-300 md:group-hover:-translate-y-2">
                 <img
-                  src={departmentImages[d.slug]}
-                  alt={d.label}
-                  width={800}
-                  height={900}
+                  src={departmentImages.uomo}
+                  alt="Uomo"
+                  width={1200}
+                  height={675}
                   loading="lazy"
-                  className={`w-full object-contain transition-transform duration-500 group-hover:scale-[1.025] ${d.slug === "uomo" ? "aspect-[16/9] md:aspect-[4/3]" : "aspect-[16/9]"}`}
+                  className="aspect-[4/3] w-full object-contain md:aspect-[4/5]"
                 />
-              </div>
-              <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-4 md:p-6 ${d.slug !== "bambino" ? "text-background" : "text-foreground"}`}>
-                <div><span className="text-[11px] font-bold uppercase tracking-[0.16em]">Esplora</span><h2 className="mt-1 text-2xl font-extrabold uppercase md:text-4xl">{d.label}</h2></div>
-                <span className={`flex h-11 w-11 items-center justify-center rounded-full ${d.slug !== "bambino" ? "bg-background text-foreground" : "bg-foreground text-background"}`}><ArrowRight className="h-5 w-5" /></span>
+                <div className="absolute -bottom-3 left-3 bg-foreground px-5 py-4 text-background md:-bottom-6 md:-left-6 md:px-8 md:py-6 md:pr-16">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-background/70">Collezione</span>
+                  <h3 className="mt-1 text-3xl font-extrabold uppercase md:text-5xl">Uomo</h3>
+                </div>
+                <span className="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full border-2 border-foreground bg-background text-foreground transition-transform duration-300 group-hover:scale-110 md:bottom-8 md:right-8 md:h-14 md:w-14">
+                  <ArrowRight className="h-6 w-6" />
+                </span>
               </div>
             </Link>
-          ))}
+
+            <div className="grid gap-5 md:col-span-5 md:grid-rows-2 md:gap-7">
+              {(["donna", "bambino"] as const).map((slug) => {
+                const department = departments.find((item) => item.slug === slug);
+                if (!department) return null;
+                return (
+                  <Link
+                    key={slug}
+                    to="/reparto/$slug"
+                    params={{ slug }}
+                    className="group relative min-h-[250px] overflow-hidden border-[6px] border-foreground bg-background transition-transform duration-300 md:group-hover:-translate-y-2"
+                  >
+                    <img
+                      src={departmentImages[slug]}
+                      alt={department.label}
+                      width={1200}
+                      height={675}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.025]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/65 via-transparent to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 md:p-7">
+                      <div className="text-background">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-background/75">Esplora</span>
+                        <h3 className="mt-1 text-3xl font-extrabold uppercase md:text-4xl">{department.label}</h3>
+                      </div>
+                      <span className={`flex h-11 w-11 items-center justify-center rounded-full ${slug === "bambino" ? "bg-brand-red text-background" : "bg-background text-foreground"}`}>
+                        <ArrowRight className="h-5 w-5" />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
