@@ -96,7 +96,7 @@ export function CatalogListing({
               </button>
             )}
           </div>
-          <FilterSections facets={facets} value={value} onChange={onChange} defaultOpen="all" desktopGrid />
+          <FilterSections facets={facets} value={value} onChange={onChange} desktopGrid />
         </div>
       </section>
 

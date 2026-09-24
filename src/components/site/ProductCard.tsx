@@ -24,7 +24,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           params={{ slug: product.slug }}
           className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <div className="relative aspect-[3/4] overflow-hidden bg-surface p-1">
+          <div className="relative aspect-[3/4] overflow-hidden bg-background">
             <img
               src={variant.image}
               alt={`${product.brand} ${product.name} — ${variant.label}`}
@@ -41,7 +41,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
                 loading="lazy"
                 width={800}
                 height={1066}
-                className="absolute inset-0 hidden h-full w-full object-contain p-1 opacity-0 transition-opacity duration-300 md:block md:group-hover:opacity-100"
+                className="absolute inset-0 hidden h-full w-full object-contain opacity-0 transition-opacity duration-300 md:block md:group-hover:opacity-100"
               />
             )}
 

@@ -50,7 +50,7 @@ export function QuickAddSheet({
     >
       <div className="p-4">
         <div className="flex gap-3">
-          <img src={variant.image} alt="" width={120} height={160} className="h-28 w-21 object-cover" />
+          <img src={variant.image} alt="" width={120} height={160} className="h-28 w-21 bg-background object-contain" />
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.08em]">{product.brand}</div>
             <div className="text-sm text-muted-foreground">{product.name}</div>
@@ -75,7 +75,7 @@ export function QuickAddSheet({
                   aria-pressed={i === vi}
                   className={`h-16 w-14 shrink-0 overflow-hidden border ${i === vi ? "border-foreground" : "border-border"}`}
                 >
-                  <img src={v.image} alt="" width={56} height={64} className="h-full w-full object-cover" />
+                  <img src={v.image} alt="" width={56} height={64} className="h-full w-full bg-background object-contain" />
                 </button>
               ))}
             </div>

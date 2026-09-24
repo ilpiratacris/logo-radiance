@@ -96,15 +96,22 @@ function Home() {
         </div>
       </section>
 
-      {/* ACCESSO RAPIDO AI REPARTI — griglia cromatica dinamica */}
-      <section className="bg-surface py-5 md:py-10">
-        <div className="container-mb grid grid-cols-2 gap-3 md:grid-cols-12 md:gap-5">
+      {/* ACCESSO RAPIDO AI REPARTI — scelta editoriale, neutrale e dinamica */}
+      <section className="bg-brand-red py-8 md:py-14">
+        <div className="container-mb mb-6 flex items-end justify-between gap-5 text-background md:mb-8">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-background/75">Inizia da qui</p>
+            <h2 className="mt-1 max-w-2xl text-3xl font-extrabold uppercase leading-none md:text-5xl">Scegli il tuo mondo</h2>
+          </div>
+          <p className="hidden max-w-xs text-sm text-background/80 md:block">Tre selezioni diverse, un solo catalogo multibrand.</p>
+        </div>
+        <div className="container-mb grid grid-cols-2 gap-2 md:grid-cols-12 md:gap-4">
           {[...departments].sort((a, b) => Number(b.slug === "uomo") - Number(a.slug === "uomo")).map((d) => (
             <Link
               key={d.slug}
               to="/reparto/$slug"
               params={{ slug: d.slug }}
-              className={`group relative overflow-hidden ${d.slug === "uomo" ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
+              className={`group relative overflow-hidden border-4 border-background ${d.slug === "uomo" ? "col-span-2 md:col-span-7 md:row-span-2" : "md:col-span-5"}`}
             >
               <div className={d.slug === "uomo" ? "bg-foreground" : d.slug === "donna" ? "bg-brand-red" : "bg-background"}>
                 <img
@@ -126,17 +133,17 @@ function Home() {
       </section>
 
       {/* NOVITÀ */}
-      <div className="border-y-8 border-brand-red bg-background"><ProductCarousel
+      <div className="border-b-8 border-foreground bg-background"><ProductCarousel
         eyebrow="Appena arrivati"
         title="Novità"
         products={news}
       /></div>
 
       {/* BRAND */}
-      <div className="border-t-8 border-foreground"><BrandCarousel /></div>
+      <div className="border-y-8 border-brand-red"><BrandCarousel /></div>
 
       {/* BEST SELLER */}
-      <div className="bg-background"><ProductCarousel
+      <div className="border-b-8 border-foreground bg-background"><ProductCarousel
         eyebrow="I più amati"
         title="Best seller"
         products={best}
