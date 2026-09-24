@@ -5,9 +5,9 @@ import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { BrandCarousel } from "@/components/site/BrandCarousel";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
-import departmentUomoWide from "@/assets/department-uomo-wide.jpg";
-import departmentDonnaWide from "@/assets/department-donna-wide.jpg";
-import departmentBambinoWide from "@/assets/department-bambino-wide.jpg";
+import departmentUomoPortrait from "@/assets/department-uomo-portrait.jpg";
+import departmentDonnaLandscape from "@/assets/department-donna-landscape.jpg";
+import departmentBambinoLandscape from "@/assets/department-bambino-landscape.jpg";
 import {
   bestSellers,
   campaigns,
@@ -50,9 +50,9 @@ function Home() {
   const best = prioritize(bestSellers());
   const promoList = prioritize(promoProducts());
   const departmentImages = {
-    uomo: departmentUomoWide,
-    donna: departmentDonnaWide,
-    bambino: departmentBambinoWide,
+    uomo: departmentUomoPortrait,
+    donna: departmentDonnaLandscape,
+    bambino: departmentBambinoLandscape,
   };
 
   return (
@@ -121,10 +121,10 @@ function Home() {
                 <img
                   src={departmentImages.uomo}
                   alt="Uomo"
-                  width={1200}
-                  height={675}
+                  width={1024}
+                  height={1280}
                   loading="lazy"
-                  className="aspect-[4/3] w-full object-contain md:aspect-[4/5]"
+                  className="aspect-[4/5] w-full object-cover"
                 />
                 <div className="absolute -bottom-3 left-3 bg-foreground px-5 py-4 text-background md:-bottom-6 md:-left-6 md:px-8 md:py-6 md:pr-16">
                   <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-background/70">Collezione</span>
@@ -150,10 +150,10 @@ function Home() {
                     <img
                       src={departmentImages[slug]}
                       alt={department.label}
-                      width={1200}
-                      height={675}
+                       width={1280}
+                       height={720}
                       loading="lazy"
-                      className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.025]"
+                       className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/65 via-transparent to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 md:p-7">
