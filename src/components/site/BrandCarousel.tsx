@@ -7,7 +7,7 @@ export function BrandCarousel() {
   const others = brands.filter((b) => !b.featured);
 
   return (
-    <section className="bg-brand-pink py-10 md:py-14">
+    <section className="bg-background py-10 md:py-14">
       <div className="container-mb flex items-end justify-between gap-4">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
