@@ -10,14 +10,10 @@ import {
   campaigns,
   departments,
   editorialImage,
-  navTree,
   newArrivals,
-  productsByDepartment,
   promoProducts,
-  type DepartmentSlug,
   type Product,
 } from "@/lib/catalog";
-import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -39,26 +35,17 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { department, hydrated } = useStore();
-  const dep: DepartmentSlug = hydrated ? department : "uomo";
-  const depLabel = departments.find((d) => d.slug === dep)!.label;
-
   const hero = campaigns[0]!;
   const promo = campaigns[1]!;
 
-  const depProducts = productsByDepartment(dep);
-  /** priorità al reparto attivo, senza duplicati */
+  /** Selezione generale, con priorità commerciale Uomo senza reparto preselezionato. */
   const prioritize = (list: Product[]) => {
-    const ordered = [...list.filter((p) => p.department === dep), ...list.filter((p) => p.department !== dep)];
+    const ordered = [...list.filter((p) => p.department === "uomo"), ...list.filter((p) => p.department !== "uomo")];
     return Array.from(new Map(ordered.map((p) => [p.slug, p])).values()).slice(0, 10);
   };
   const news = prioritize(newArrivals());
   const best = prioritize(bestSellers());
   const promoList = prioritize(promoProducts());
-
-  const shopByCategory = navTree[dep][0]!.items.slice(0, 3)
-    .concat(navTree[dep][1]!.items.slice(0, 2))
-    .concat(navTree[dep][2]!.items.slice(0, 1));
 
   return (
     <SiteLayout>
@@ -133,47 +120,9 @@ function Home() {
       {/* NOVITÀ */}
       <div className="border-y-8 border-brand-red bg-background"><ProductCarousel
         eyebrow="Appena arrivati"
-        title={`Novità ${depLabel}`}
+        title="Novità"
         products={news}
-        to="/categoria/$slug"
-        toParams={{ slug: dep }}
       /></div>
-
-      {/* SHOP BY CATEGORY */}
-      <section className="bg-brand-yellow py-8 md:py-12">
-        <div className="container-mb">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Scopri per categoria
-          </div>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight md:text-2xl">{depLabel}, reparto per reparto</h2>
-        </div>
-        <div className="container-mb mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
-          {shopByCategory.map((c, i) => {
-            const img = depProducts.find((p) => p.category === c.slug)?.variants[0]?.image ?? editorialImage;
-            return (
-              <Link
-                key={c.slug}
-                to="/categoria/$slug"
-                params={{ slug: dep }}
-                search={{ cat: c.slug }}
-                className="group relative overflow-hidden"
-              >
-                <img
-                  src={img}
-                  alt={c.label}
-                  width={600}
-                  height={600}
-                  loading={i < 2 ? "eager" : "lazy"}
-                  className="aspect-square w-full bg-surface object-contain transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-                <span className="absolute bottom-0 left-0 m-2 bg-background px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.06em]">
-                  {c.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
 
       {/* BRAND */}
       <div className="border-t-8 border-foreground"><BrandCarousel /></div>
@@ -183,8 +132,6 @@ function Home() {
         eyebrow="I più amati"
         title="Best seller"
         products={best}
-        to="/categoria/$slug"
-        toParams={{ slug: dep }}
       /></div>
 
       {/* PROMO ATTIVA */}
@@ -239,7 +186,7 @@ function Home() {
             </p>
             <Link
               to="/categoria/$slug"
-              params={{ slug: dep }}
+              params={{ slug: "uomo" }}
               search={{ cat: "giubbotti" }}
               className="mt-5 inline-flex h-12 items-center bg-background px-6 text-sm font-semibold text-foreground"
             >
