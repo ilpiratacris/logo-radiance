@@ -9,25 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WishlistRouteImport } from './routes/wishlist'
-import { Route as CarrelloRouteImport } from './routes/carrello'
-import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as CarrelloRouteImport } from './routes/carrello'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as BrandIndexRouteImport } from './routes/brand.index'
-import { Route as RepartoSlugRouteImport } from './routes/reparto.$slug'
-import { Route as PromoSlugRouteImport } from './routes/promo.$slug'
-import { Route as ProdottoSlugRouteImport } from './routes/prodotto.$slug'
-import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
+import { Route as CategoriaSlugRouteImport } from './routes/categoria.$slug'
+import { Route as ProdottoSlugRouteImport } from './routes/prodotto.$slug'
+import { Route as PromoSlugRouteImport } from './routes/promo.$slug'
+import { Route as RepartoSlugRouteImport } from './routes/reparto.$slug'
 
-const WishlistRoute = WishlistRouteImport.update({
-  id: '/wishlist',
-  path: '/wishlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CarrelloRoute = CarrelloRouteImport.update({
-  id: '/carrello',
-  path: '/carrello',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -35,9 +30,14 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CarrelloRoute = CarrelloRouteImport.update({
+  id: '/carrello',
+  path: '/carrello',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BrandIndexRoute = BrandIndexRouteImport.update({
@@ -45,19 +45,9 @@ const BrandIndexRoute = BrandIndexRouteImport.update({
   path: '/brand/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RepartoSlugRoute = RepartoSlugRouteImport.update({
-  id: '/reparto/$slug',
-  path: '/reparto/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PromoSlugRoute = PromoSlugRouteImport.update({
-  id: '/promo/$slug',
-  path: '/promo/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProdottoSlugRoute = ProdottoSlugRouteImport.update({
-  id: '/prodotto/$slug',
-  path: '/prodotto/$slug',
+const BrandSlugRoute = BrandSlugRouteImport.update({
+  id: '/brand/$slug',
+  path: '/brand/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriaSlugRoute = CategoriaSlugRouteImport.update({
@@ -65,9 +55,19 @@ const CategoriaSlugRoute = CategoriaSlugRouteImport.update({
   path: '/categoria/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BrandSlugRoute = BrandSlugRouteImport.update({
-  id: '/brand/$slug',
-  path: '/brand/$slug',
+const ProdottoSlugRoute = ProdottoSlugRouteImport.update({
+  id: '/prodotto/$slug',
+  path: '/prodotto/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromoSlugRoute = PromoSlugRouteImport.update({
+  id: '/promo/$slug',
+  path: '/promo/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RepartoSlugRoute = RepartoSlugRouteImport.update({
+  id: '/reparto/$slug',
+  path: '/reparto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -162,18 +162,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wishlist': {
-      id: '/wishlist'
-      path: '/wishlist'
-      fullPath: '/wishlist'
-      preLoaderRoute: typeof WishlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/carrello': {
-      id: '/carrello'
-      path: '/carrello'
-      fullPath: '/carrello'
-      preLoaderRoute: typeof CarrelloRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account': {
@@ -183,11 +176,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/carrello': {
+      id: '/carrello'
+      path: '/carrello'
+      fullPath: '/carrello'
+      preLoaderRoute: typeof CarrelloRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/brand/': {
@@ -197,25 +197,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BrandIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reparto/$slug': {
-      id: '/reparto/$slug'
-      path: '/reparto/$slug'
-      fullPath: '/reparto/$slug'
-      preLoaderRoute: typeof RepartoSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/promo/$slug': {
-      id: '/promo/$slug'
-      path: '/promo/$slug'
-      fullPath: '/promo/$slug'
-      preLoaderRoute: typeof PromoSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/prodotto/$slug': {
-      id: '/prodotto/$slug'
-      path: '/prodotto/$slug'
-      fullPath: '/prodotto/$slug'
-      preLoaderRoute: typeof ProdottoSlugRouteImport
+    '/brand/$slug': {
+      id: '/brand/$slug'
+      path: '/brand/$slug'
+      fullPath: '/brand/$slug'
+      preLoaderRoute: typeof BrandSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categoria/$slug': {
@@ -225,11 +211,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/brand/$slug': {
-      id: '/brand/$slug'
-      path: '/brand/$slug'
-      fullPath: '/brand/$slug'
-      preLoaderRoute: typeof BrandSlugRouteImport
+    '/prodotto/$slug': {
+      id: '/prodotto/$slug'
+      path: '/prodotto/$slug'
+      fullPath: '/prodotto/$slug'
+      preLoaderRoute: typeof ProdottoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo/$slug': {
+      id: '/promo/$slug'
+      path: '/promo/$slug'
+      fullPath: '/promo/$slug'
+      preLoaderRoute: typeof PromoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reparto/$slug': {
+      id: '/reparto/$slug'
+      path: '/reparto/$slug'
+      fullPath: '/reparto/$slug'
+      preLoaderRoute: typeof RepartoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
