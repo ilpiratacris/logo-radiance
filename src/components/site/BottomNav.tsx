@@ -1,49 +1,45 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Home, Search, ShoppingBag, User } from "lucide-react";
+import { CountDot } from "@/components/site/CountDot";
 import { useStore } from "@/lib/store";
 
-/** Barra mobile: solo azioni primarie, nascosta quando serve spazio (PDP sticky CTA). */
+/** Barra mobile: solo azioni primarie, nascosta quando serve spazio (barra Aggiungi della scheda prodotto). */
 export function BottomNav({ hidden }: { hidden?: boolean }) {
   const { cartCount, wishlist, setSearchOpen, openCart, hydrated } = useStore();
   if (hidden) return null;
 
-  const cls = "flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium";
+  const cls =
+    "relative flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium";
+  // ancorato all'icona (centro della cella), non al bordo: resta vicino anche su tablet
+  const dot = "absolute left-1/2 top-1 ml-1.5 font-normal";
 
   return (
     <nav
       aria-label="Navigazione rapida"
       className="fixed inset-x-0 bottom-0 z-40 flex h-[58px] border-t border-border bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
-      <Link to="/" className={cls} activeProps={{ className: `${cls} text-foreground` }}>
-        <Home className="h-5 w-5" strokeWidth={1.5} />
+      <Link to="/" className={cls}>
+        <Home className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
         Home
       </Link>
-      <button onClick={() => setSearchOpen(true)} className={cls}>
-        <Search className="h-5 w-5" strokeWidth={1.5} />
+      <button type="button" onClick={() => setSearchOpen(true)} className={cls}>
+        <Search className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
         Cerca
       </button>
-      <Link to="/wishlist" className={`${cls} relative`}>
-        <Heart className="h-5 w-5" strokeWidth={1.5} />
+      <Link to="/wishlist" className={cls}>
+        <Heart className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
         Wishlist
-        {hydrated && wishlist.length > 0 && <Badge>{wishlist.length}</Badge>}
+        {hydrated && wishlist.length > 0 && <CountDot className={dot}>{wishlist.length}</CountDot>}
       </Link>
       <Link to="/account" className={cls}>
-        <User className="h-5 w-5" strokeWidth={1.5} />
+        <User className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
         Account
       </Link>
-      <button onClick={openCart} className={`${cls} relative`}>
-        <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+      <button type="button" onClick={openCart} className={cls}>
+        <ShoppingBag className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
         Carrello
-        {hydrated && cartCount > 0 && <Badge>{cartCount}</Badge>}
+        {hydrated && cartCount > 0 && <CountDot className={dot}>{cartCount}</CountDot>}
       </button>
     </nav>
-  );
-}
-
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="absolute right-4 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] leading-none text-background">
-      {children}
-    </span>
   );
 }

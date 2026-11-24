@@ -17,7 +17,7 @@ export function SiteLayout({
     <div className="flex min-h-screen flex-col bg-background">
       <TopBar />
       <Header />
-      <main className="flex-1 pb-[58px] lg:pb-0">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
       <BottomNav hidden={hideBottomNav} />
       <CartDrawer />

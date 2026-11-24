@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, Percent, Sparkles, Tag } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BottomSheet } from "@/components/site/BottomSheet";
 import { brands, departments, navTree, type DepartmentSlug } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
@@ -9,6 +9,11 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
   const { department, setDepartment } = useStore();
   const [dep, setDep] = useState<DepartmentSlug>(department);
   const [expanded, setExpanded] = useState<string | null>("abbigliamento");
+
+  // a ogni apertura il menu riparte dal reparto della pagina corrente
+  useEffect(() => {
+    if (open) setDep(department);
+  }, [open, department]);
 
   const pick = (d: DepartmentSlug) => {
     setDep(d);
@@ -123,7 +128,11 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                     </li>
                   ))}
                 <li>
-                  <Link to="/brand" onClick={onClose} className="flex h-12 items-center px-4 text-sm font-medium underline">
+                  <Link
+                    to="/brand"
+                    onClick={onClose}
+                    className="flex h-12 items-center px-4 text-sm font-medium underline"
+                  >
                     Vedi tutti i brand
                   </Link>
                 </li>
@@ -135,16 +144,24 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
             to="/promo/$slug"
             params={{ slug: "promo-autunno" }}
             onClick={onClose}
-            className="flex h-14 items-center gap-2 border-b border-border px-4 text-sm font-semibold text-[color:var(--color-sale)]"
+            className="flex h-14 items-center gap-2 border-b border-border px-4 text-sm font-semibold text-sale"
           >
             <Percent className="h-4 w-4" strokeWidth={1.75} /> Promo
           </Link>
 
           <div className="mt-6 space-y-1 px-4">
-            <Link to="/account" onClick={onClose} className="flex h-12 items-center text-sm text-muted-foreground">
+            <Link
+              to="/account"
+              onClick={onClose}
+              className="flex h-12 items-center text-sm text-muted-foreground"
+            >
               Il mio account
             </Link>
-            <Link to="/wishlist" onClick={onClose} className="flex h-12 items-center text-sm text-muted-foreground">
+            <Link
+              to="/wishlist"
+              onClick={onClose}
+              className="flex h-12 items-center text-sm text-muted-foreground"
+            >
               Wishlist
             </Link>
           </div>

@@ -1,20 +1,26 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ChevronDown, CreditCard, Heart, Ruler, RotateCcw, Truck } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { ProductCarousel } from "@/components/site/ProductCarousel";
-import { RecentlyViewed } from "@/components/site/RecentlyViewed";
-import { SizeGuide } from "@/components/site/SizeGuide";
+import { Accordion, type AccordionItem } from "@/components/site/Accordion";
 import { BrandMark } from "@/components/site/BrandMark";
+import { Breadcrumb } from "@/components/site/Breadcrumb";
+import { ColorThumbs } from "@/components/site/ColorThumbs";
+import { Price } from "@/components/site/Price";
+import { ProductCarousel } from "@/components/site/ProductCarousel";
+import { Reassure } from "@/components/site/Reassure";
+import { SizeGuide } from "@/components/site/SizeGuide";
+import { SizeSelector } from "@/components/site/SizeSelector";
+import { StickyAddToCart } from "@/components/site/StickyAddToCart";
 import {
-  brandSlug,
+  categoryLabel,
+  departments,
   discountOf,
   findProduct,
   formatPrice,
-  productsByBrand,
   productsByCategory,
+  productsByDepartment,
   products,
-  type Product,
 } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 
@@ -26,7 +32,12 @@ export const Route = createFileRoute("/prodotto/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Prodotto non disponibile — MyBrand Italia" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Prodotto non disponibile — MyBrand Italia" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const title = `${loaderData.brand} ${loaderData.name} | MyBrand Italia`;
     const description = `${loaderData.brand} ${loaderData.name} a ${formatPrice(loaderData.price)}. Acquista online su MyBrand Italia: taglie, colori e spedizione tracciata.`;
@@ -45,7 +56,7 @@ export const Route = createFileRoute("/prodotto/$slug")({
     <SiteLayout>
       <div className="container-mb py-20 text-center">
         <h1 className="text-xl font-semibold">Prodotto non disponibile</h1>
-        <Link to="/" className="btn-primary mt-5 inline-flex">
+        <Link to="/" className="btn-primary mt-5">
           Torna alla home
         </Link>
       </div>
@@ -57,17 +68,19 @@ export const Route = createFileRoute("/prodotto/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const product = findProduct(slug)!;
-  const { addToCart, toggleWishlist, inWishlist, pushRecent, hydrated } = useStore();
+  const { addToCart, toggleWishlist, inWishlist, pushRecent, hydrated, department, setDepartment } =
+    useStore();
 
   const [vi, setVi] = useState(0);
   const [size, setSize] = useState<string | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
-  const [openAcc, setOpenAcc] = useState<string | null>("descrizione");
 
   const variant = product.variants[vi] ?? product.variants[0]!;
   const discount = discountOf(product);
+  const onSale = discount > 0 && product.oldPrice !== undefined;
   const liked = hydrated && inWishlist(product.slug);
+  const depLabel = departments.find((d) => d.slug === product.department)!.label;
 
   useEffect(() => {
     setVi(0);
@@ -78,6 +91,11 @@ function ProductPage() {
     pushRecent(product.slug);
   }, [product.slug, pushRecent]);
 
+  // la testata segue il reparto del prodotto (scheda aperta e sottocategorie)
+  useEffect(() => {
+    if (product.department !== department) setDepartment(product.department);
+  }, [product.department, department, setDepartment]);
+
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > 520);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -86,16 +104,20 @@ function ProductPage() {
   }, []);
 
   const gallery = useMemo(
-    () => [variant.image, variant.altImage, ...product.variants.filter((_, i) => i !== vi).map((v) => v.image)]
-      .filter((x): x is string => Boolean(x))
-      .slice(0, 5),
+    () =>
+      [
+        variant.image,
+        variant.altImage,
+        ...product.variants.filter((_, i) => i !== vi).map((v) => v.image),
+      ]
+        .filter((x): x is string => Boolean(x))
+        .filter((x, i, list) => list.indexOf(x) === i)
+        .slice(0, 5),
     [variant, product.variants, vi],
   );
   const [mainIdx, setMainIdx] = useState(0);
-  useEffect(() => setMainIdx(0), [vi]);
-
-  const stockOf = (s: string) => variant.sizes.find((x) => x.size === s)?.stock ?? 0;
-  const selectedStock = size ? stockOf(size) : 0;
+  useEffect(() => setMainIdx(0), [vi, slug]);
+  const mainImage = gallery[mainIdx] ?? variant.image;
 
   const add = () => {
     if (!size) return;
@@ -107,17 +129,30 @@ function ProductPage() {
       color: variant.label,
       size,
       price: product.price,
+      oldPrice: product.oldPrice,
       qty: 1,
     });
   };
 
-  const related = productsByCategory(product.department, product.category).filter((p) => p.slug !== product.slug);
-  const sameBrand = productsByBrand(brandSlug(product.brand)).filter((p) => p.slug !== product.slug);
-  const look: Product[] = products
+  const sameCategory = productsByCategory(product.department, product.category).filter(
+    (p) => p.slug !== product.slug,
+  );
+  const similar = (
+    sameCategory.length >= 4
+      ? sameCategory
+      : [
+          ...sameCategory,
+          ...productsByDepartment(product.department).filter(
+            (p) =>
+              p.slug !== product.slug && p.group === product.group && !sameCategory.includes(p),
+          ),
+        ]
+  ).slice(0, 10);
+  const look = products
     .filter((p) => p.department === product.department && p.group !== product.group)
     .slice(0, 8);
 
-  const accordions = [
+  const accordion: AccordionItem[] = [
     { id: "descrizione", label: "Descrizione", body: <p>{product.description}</p> },
     {
       id: "dettagli",
@@ -134,241 +169,175 @@ function ProductPage() {
     {
       id: "spedizione",
       label: "Spedizione e reso",
-      body: <p>PLACEHOLDER: tempi, costi e condizioni di reso da backend.</p>,
+      body: <p>[Condizioni di spedizione e reso del negozio]</p>,
     },
-    { id: "pagamenti", label: "Pagamenti", body: <p>PLACEHOLDER: metodi di pagamento da backend.</p> },
+    { id: "pagamenti", label: "Pagamenti", body: <p>[Metodi di pagamento attivi]</p> },
   ];
 
   return (
     <SiteLayout hideBottomNav={showSticky}>
-      <nav aria-label="Breadcrumb" className="container-mb pt-3 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">
-          Home
-        </Link>
-        <span className="px-1.5">/</span>
-        <Link to="/categoria/$slug" params={{ slug: product.department }} className="capitalize hover:text-foreground">
-          {product.department}
-        </Link>
-        <span className="px-1.5">/</span>
-        <Link
-          to="/categoria/$slug"
-          params={{ slug: product.department }}
-          search={{ cat: product.category }}
-          className="capitalize hover:text-foreground"
-        >
-          {product.category.replace(/-/g, " ")}
-        </Link>
-      </nav>
+      <div className="container-mb pb-8 pt-3 lg:pb-14 lg:pt-5">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: depLabel, to: "/categoria/$slug", params: { slug: product.department } },
+            {
+              label: categoryLabel(product.department, product.category),
+              to: "/categoria/$slug",
+              params: { slug: product.department },
+              search: { cat: product.category },
+            },
+          ]}
+        />
 
-      <div className="container-mb grid gap-6 pt-3 lg:grid-cols-[55%_1fr] lg:gap-10">
-        {/* GALLERY */}
-        <div className="lg:flex lg:gap-3">
-          <div className="order-2 hidden shrink-0 flex-col gap-2 lg:flex">
-            {gallery.map((g, i) => (
-              <button
-                key={`${g}-${i}`}
-                onClick={() => setMainIdx(i)}
-                aria-label={`Immagine ${i + 1}`}
-                className={`h-20 w-16 overflow-hidden border ${
-                  mainIdx === i ? "border-foreground" : "border-border"
-                }`}
-              >
-                <img src={g} alt="" width={64} height={80} className="h-full w-full bg-background object-contain" />
-              </button>
-            ))}
-          </div>
-          {/* mobile: swipe */}
-          <div className="order-1 -mx-4 flex snap-x snap-mandatory gap-1 overflow-x-auto lg:mx-0 lg:block lg:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {gallery.map((g, i) => (
+        <div className="mt-3 grid gap-5 lg:mt-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-12">
+          {/* GALLERIA: foto grande, miniature sotto (mobile) o a sinistra (desktop) */}
+          <div className="-mx-4 grid gap-3 md:mx-auto md:w-full md:max-w-lg lg:mx-0 lg:max-w-none lg:grid-cols-[88px_minmax(0,1fr)] lg:items-start">
+            <div className="relative lg:order-2">
               <img
-                key={`${g}-m-${i}`}
-                src={g}
-                alt={`${product.brand} ${product.name}`}
+                src={mainImage}
+                alt={`${product.brand} ${product.name}, colore ${variant.label.toLowerCase()}`}
                 width={900}
                 height={1200}
-                loading={i === 0 ? "eager" : "lazy"}
-                className={`w-[86%] shrink-0 snap-center bg-background object-contain lg:w-full lg:max-h-[700px] ${
-                  i === mainIdx ? "lg:block" : "lg:hidden"
-                }`}
+                fetchPriority="high"
+                className="aspect-[3/4] w-full bg-background object-contain"
               />
-            ))}
-          </div>
-          <div className="order-3 flex justify-center gap-1.5 lg:hidden">
-            {gallery.map((_, i) => (
-              <span key={i} className="h-1 w-6 bg-border" />
-            ))}
-          </div>
-        </div>
-
-        {/* INFO */}
-        <div className="lg:pt-2">
-          <div className="flex items-center gap-3">
-            <BrandMark brand={product.brand} />
-            <Link
-              to="/brand/$slug"
-              params={{ slug: brandSlug(product.brand) }}
-              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-            >
-              Vedi tutto {product.brand}
-            </Link>
-          </div>
-          <h1 className="mt-2 text-xl font-medium md:text-2xl">{product.name}</h1>
-
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className={`text-2xl font-semibold ${discount ? "text-[color:var(--color-sale)]" : ""}`}>
-              {formatPrice(product.price)}
-            </span>
-            {product.oldPrice && (
-              <>
-                <span className="text-sm text-muted-foreground line-through">{formatPrice(product.oldPrice)}</span>
-                <span className="text-sm font-semibold text-[color:var(--color-sale)]">−{discount}%</span>
-              </>
-            )}
-          </div>
-
-          {/* COLORE: thumbnail reali */}
-          <div className="mt-6">
-            <div className="text-xs font-semibold uppercase tracking-[0.12em]">
-              Colore: <span className="font-normal normal-case tracking-normal text-muted-foreground">{variant.label}</span>
+              {onSale && (
+                <span className="absolute left-0 top-3 bg-sale px-2 py-[3px] text-xs font-semibold leading-[18px] tracking-wide text-background">
+                  −{discount}%
+                </span>
+              )}
             </div>
-            <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {product.variants.map((v, i) => (
+            <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 md:px-0 lg:order-1 lg:flex-col lg:overflow-visible">
+              {gallery.map((g, i) => (
                 <button
-                  key={v.key}
-                  onClick={() => setVi(i)}
-                  aria-label={v.label}
-                  aria-pressed={i === vi}
-                  className={`h-16 w-14 shrink-0 overflow-hidden border-2 ${
-                    i === vi ? "border-foreground" : "border-transparent"
+                  key={g}
+                  type="button"
+                  onClick={() => setMainIdx(i)}
+                  aria-label={`Foto ${i + 1}`}
+                  aria-pressed={mainIdx === i}
+                  className={`w-14 shrink-0 border bg-background transition-colors lg:w-[88px] ${
+                    mainIdx === i ? "border-foreground" : "border-border hover:border-border-strong"
                   }`}
                 >
-                  <img src={v.image} alt={v.label} width={56} height={64} className="h-full w-full bg-background object-contain" />
+                  <img
+                    src={g}
+                    alt=""
+                    width={86}
+                    height={115}
+                    className="aspect-[3/4] w-full object-contain"
+                  />
                 </button>
               ))}
             </div>
           </div>
 
-          {/* TAGLIA */}
-          <div className="mt-6">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold uppercase tracking-[0.12em]">Taglia</div>
+          {/* INFO */}
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col items-start gap-2.5 lg:gap-3">
+              <BrandMark brand={product.brand} size="auto" />
+              <h1 className="text-xl font-medium leading-7 tracking-tight lg:text-2xl lg:leading-8">
+                {product.name}
+              </h1>
+              <Price price={product.price} oldPrice={product.oldPrice} size="lg" showDiscount />
+              {onSale && (
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-[13px] font-semibold leading-[18px] text-sale">
+                    Risparmi {formatPrice(product.oldPrice! - product.price)}
+                  </p>
+                  <p className="text-xs leading-4 text-muted-foreground">
+                    Prezzo più basso nei 30 giorni precedenti la riduzione:{" "}
+                    <span className="whitespace-nowrap">{formatPrice(product.oldPrice!)}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div className="label-caps">
+                Colore{" "}
+                <span className="font-normal normal-case tracking-normal text-muted-foreground">
+                  {variant.label}
+                </span>
+              </div>
+              <ColorThumbs
+                variants={product.variants}
+                value={vi}
+                onChange={(i) => {
+                  setVi(i);
+                  setSize(null);
+                }}
+                size="md"
+                className="no-scrollbar overflow-x-auto"
+              />
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="label-caps">Taglia</div>
+                <button
+                  type="button"
+                  onClick={() => setGuideOpen(true)}
+                  className="-my-3 py-3 text-xs font-medium leading-4 underline underline-offset-4"
+                >
+                  Guida alle taglie
+                </button>
+              </div>
+              <SizeSelector
+                sizes={variant.sizes}
+                selected={size ? [size] : []}
+                onSelect={setSize}
+                large
+                columns="grid-cols-4 lg:grid-cols-6"
+                showStock
+              />
+            </div>
+
+            <div className="flex items-stretch gap-2">
+              <button type="button" onClick={add} disabled={!size} className="btn-primary flex-1">
+                {size ? "Aggiungi al carrello" : "Seleziona una taglia"}
+              </button>
               <button
-                onClick={() => setGuideOpen(true)}
-                className="flex h-9 items-center gap-1.5 text-xs underline underline-offset-4"
+                type="button"
+                onClick={() => toggleWishlist(product.slug)}
+                aria-label={liked ? "Rimuovi dalla wishlist" : "Aggiungi alla wishlist"}
+                aria-pressed={liked}
+                className="icon-btn-boxed"
               >
-                <Ruler className="h-3.5 w-3.5" strokeWidth={1.5} /> Guida alle taglie
+                <Heart
+                  className={`h-5 w-5 ${liked ? "fill-current" : ""}`}
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
               </button>
             </div>
-            <div className="mt-2 grid grid-cols-4 gap-2 sm:grid-cols-6">
-              {variant.sizes.map((s) => {
-                const out = s.stock === 0;
-                return (
-                  <button
-                    key={s.size}
-                    disabled={out}
-                    onClick={() => setSize(s.size)}
-                    aria-pressed={size === s.size}
-                    className={`h-12 border text-sm ${
-                      size === s.size
-                        ? "border-foreground bg-foreground text-background"
-                        : out
-                          ? "cursor-not-allowed border-border text-muted-foreground line-through opacity-50"
-                          : "border-border hover:border-foreground"
-                    }`}
-                  >
-                    {s.size}
-                  </button>
-                );
-              })}
-            </div>
-            {size && selectedStock > 0 && selectedStock <= 3 && (
-              <p className="mt-2 text-xs text-[color:var(--color-sale)]">Solo {selectedStock} disponibili</p>
-            )}
-          </div>
 
-          {/* CTA */}
-          <div className="mt-6 flex gap-2">
-            <button onClick={add} disabled={!size} className="btn-primary flex-1 disabled:opacity-60">
-              {size ? "Aggiungi al carrello" : "Seleziona una taglia"}
-            </button>
-            <button
-              onClick={() => toggleWishlist(product.slug)}
-              aria-label={liked ? "Rimuovi dalla wishlist" : "Aggiungi alla wishlist"}
-              aria-pressed={liked}
-              className="flex h-12 w-12 shrink-0 items-center justify-center border border-border-strong"
-            >
-              <Heart className={`h-5 w-5 ${liked ? "fill-current" : ""}`} strokeWidth={1.5} />
-            </button>
-          </div>
+            <Reassure className="mt-0" />
 
-          <ul className="mt-5 space-y-2 border-t border-border pt-5 text-xs text-muted-foreground">
-            <li className="flex items-center gap-2">
-              <Truck className="h-4 w-4" strokeWidth={1.5} /> Spedizione tracciata — tempi da backend
-            </li>
-            <li className="flex items-center gap-2">
-              <RotateCcw className="h-4 w-4" strokeWidth={1.5} /> Reso facile — condizioni da backend
-            </li>
-            <li className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" strokeWidth={1.5} /> Pagamenti sicuri
-            </li>
-          </ul>
-
-          {/* ACCORDION */}
-          <div className="mt-6 border-t border-border">
-            {accordions.map((a) => (
-              <div key={a.id} className="border-b border-border">
-                <button
-                  onClick={() => setOpenAcc(openAcc === a.id ? null : a.id)}
-                  aria-expanded={openAcc === a.id}
-                  className="flex h-14 w-full items-center justify-between text-sm font-medium"
-                >
-                  {a.label}
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform ${openAcc === a.id ? "rotate-180" : ""}`}
-                    strokeWidth={1.5}
-                  />
-                </button>
-                {openAcc === a.id && (
-                  <div className="pb-4 text-sm leading-relaxed text-muted-foreground">{a.body}</div>
-                )}
-              </div>
-            ))}
+            <Accordion key={product.slug} items={accordion} defaultOpen="descrizione" />
           </div>
         </div>
       </div>
 
-      {/* CROSS SELLING */}
-      <ProductCarousel eyebrow="Completa il look" title="Si abbina con" products={look} />
-      <ProductCarousel eyebrow="Potrebbe piacerti" title="Prodotti simili" products={related.slice(0, 10)} />
-      {sameBrand.length > 0 && (
+      <ProductCarousel eyebrow="Abbinamenti" title="Completa il look" products={look} />
+      <div className="bg-surface">
         <ProductCarousel
-          eyebrow="Stesso brand"
-          title={`Altri prodotti ${product.brand}`}
-          products={sameBrand.slice(0, 10)}
-          to="/brand/$slug"
-          toParams={{ slug: brandSlug(product.brand) }}
+          eyebrow="Dalla stessa categoria"
+          title="Prodotti simili"
+          products={similar}
+          to="/categoria/$slug"
+          toParams={{ slug: product.department }}
+          toSearch={{ cat: product.category }}
         />
-      )}
-      <RecentlyViewed exclude={product.slug} />
-
-      {/* STICKY ADD TO CART */}
-      <div
-        className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur transition-transform lg:hidden ${
-          showSticky ? "translate-y-0" : "translate-y-full"
-        }`}
-        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}
-      >
-        <div className="flex items-center gap-3 px-4 py-2.5">
-          <img src={variant.image} alt="" width={40} height={52} className="h-[52px] w-10 bg-background object-contain" />
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[11px] font-semibold uppercase tracking-[0.08em]">{product.brand}</div>
-            <div className="text-sm font-semibold">{formatPrice(product.price)}</div>
-          </div>
-          <button onClick={add} disabled={!size} className="btn-primary h-12 px-5 disabled:opacity-60">
-            {size ? "Aggiungi" : "Seleziona taglia"}
-          </button>
-        </div>
       </div>
+
+      <StickyAddToCart
+        product={product}
+        image={variant.image}
+        size={size}
+        visible={showSticky}
+        onAdd={add}
+      />
 
       <SizeGuide open={guideOpen} onClose={() => setGuideOpen(false)} brand={product.brand} />
     </SiteLayout>

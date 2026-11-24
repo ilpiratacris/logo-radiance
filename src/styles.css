@@ -21,6 +21,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -36,24 +37,33 @@
   --color-ring: var(--ring);
   --color-surface: var(--surface);
   --color-brand-red: var(--brand-red);
+  --color-brand-red-foreground: var(--brand-red-foreground);
+  --color-brand-red-hover: var(--brand-red-hover);
+
+  --shadow-sheet: 0 -4px 24px rgba(0, 0, 0, 0.12);
+  --shadow-mega: 0 12px 24px -16px rgba(0, 0, 0, 0.25);
 }
 
+/* Token del design system MyBrand (v10). */
 :root {
-  --radius: 4px;
+  --radius: 0px;
 
   --background: oklch(1 0 0);
   --surface: oklch(0.965 0.006 95);
   --foreground: oklch(0.18 0 0);
-  --brand-red: oklch(0.59 0.22 28);
+  --brand-red: #c41822;
+  --brand-red-foreground: #ffffff;
+  --brand-red-hover: #8a0110;
 
   --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
   --popover: oklch(1 0 0);
   --popover-foreground: var(--foreground);
 
-  /* Primary = near-black for CTAs */
+  /* Primary = quasi nero per le CTA */
   --primary: oklch(0.22 0.005 260);
   --primary-foreground: oklch(0.99 0 0);
+  --primary-hover: oklch(0.15 0.005 260);
 
   --secondary: oklch(0.955 0.003 90);
   --secondary-foreground: var(--foreground);
@@ -64,10 +74,10 @@
   --accent: var(--brand-red);
   --accent-foreground: oklch(1 0 0);
 
-  /* Discount / sale color — discreet red */
-  --sale: oklch(0.58 0.19 25);
+  /* Sconti e prezzi ridotti: stesso rosso del brand */
+  --sale: var(--brand-red);
 
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: var(--brand-red);
   --destructive-foreground: oklch(0.99 0 0);
 
   --border: oklch(0.92 0.004 260);
@@ -86,13 +96,14 @@
   --popover-foreground: var(--foreground);
   --primary: oklch(0.98 0.003 90);
   --primary-foreground: oklch(0.19 0.005 260);
+  --primary-hover: oklch(0.9 0.003 90);
   --secondary: oklch(0.25 0.005 260);
   --secondary-foreground: var(--foreground);
   --muted: oklch(0.25 0.005 260);
   --muted-foreground: oklch(0.7 0.005 260);
-  --accent: oklch(0.65 0.14 40);
+  --accent: #f5504c;
   --accent-foreground: oklch(0.99 0 0);
-  --sale: oklch(0.65 0.19 25);
+  --sale: #f5504c;
   --border: oklch(1 0 0 / 12%);
   --border-strong: oklch(1 0 0 / 25%);
   --input: oklch(1 0 0 / 15%);
@@ -113,13 +124,32 @@
     color: var(--color-foreground);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
   }
   img {
     display: block;
     max-width: 100%;
     height: auto;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -133,21 +163,68 @@
   }
 }
 
+/* ---------- Etichette ---------- */
+
+@utility eyebrow {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-muted-foreground);
+}
+
+@utility eyebrow-wide {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+@utility label-caps {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+@utility brand-label {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Pulsanti ---------- */
+
 @utility btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   background-color: var(--color-primary);
   color: var(--color-primary-foreground);
   font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5rem;
   padding: 0.875rem 1.5rem;
   border-radius: var(--radius);
-  transition: background-color 180ms ease, transform 180ms ease;
   letter-spacing: 0.01em;
-}
-@utility btn-primary {
-  &:hover {
-    background-color: oklch(0.15 0.005 260);
+  text-align: center;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      background-color: var(--color-primary-hover);
+    }
   }
 }
 
@@ -155,16 +232,213 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   background-color: transparent;
   color: var(--color-foreground);
   border: 1px solid var(--color-border-strong);
   font-weight: 500;
-  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0.8125rem 1.4375rem;
   border-radius: var(--radius);
-  transition: background-color 180ms ease, border-color 180ms ease;
+  text-align: center;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      border-color: var(--color-foreground);
+      background-color: var(--color-surface);
+    }
+  }
 }
-@utility btn-outline {
-  &:hover {
-    background-color: var(--color-surface);
+
+/* Chiaro sopra immagini e fasce colorate. */
+@utility btn-inverse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  padding: 0 1.5rem;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  text-align: center;
+  transition: background-color 180ms ease;
+  &:focus-visible {
+    outline: 2px solid var(--color-background);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-foreground);
+  }
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-surface);
+    }
+  }
+}
+
+/* Pulsante icona 44px, senza bordo: al passaggio un velo del colore del testo. */
+@utility icon-btn {
+  position: relative;
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 180ms ease;
+  @media (hover: hover) {
+    &:hover {
+      background-color: color-mix(in oklab, currentColor 8%, transparent);
+    }
+  }
+}
+
+/* Pulsante icona con bordo, 48px (wishlist nella scheda prodotto). */
+@utility icon-btn-boxed {
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-strong);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-foreground);
+      background-color: var(--color-surface);
+    }
+  }
+}
+
+/* Pulsante tondo sopra la foto prodotto. */
+@utility icon-btn-float {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: color-mix(in oklab, var(--color-background) 88%, transparent);
+  backdrop-filter: blur(8px);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-background);
+      box-shadow: inset 0 0 0 1px var(--color-foreground);
+    }
+  }
+}
+
+/* Aggiunta rapida sulla card: con un puntatore vero resta nascosta fino al passaggio o al fuoco. */
+@utility card-quick {
+  @media (hover: hover) {
+    opacity: 0;
+    .group:hover &,
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+}
+
+/* ---------- Chip, campi ---------- */
+
+@utility chip {
+  display: inline-flex;
+  height: 2.5rem;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--color-border);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+  &[aria-pressed="true"],
+  &[aria-current="page"],
+  &[data-active="true"] {
+    border-color: var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+  @media (hover: hover) {
+    &:not([aria-pressed="true"]):not([aria-current="page"]):not([data-active="true"]):hover {
+      border-color: var(--color-foreground);
+      background-color: var(--color-surface);
+    }
+  }
+}
+
+@utility field {
+  height: 2.75rem;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  border-radius: 0;
+  transition: border-color 180ms ease;
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-foreground);
+    }
+  }
+}
+
+/* Riquadro di ricerca: il bordo risponde al passaggio e al fuoco interno. */
+@utility search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border-strong);
+  padding: 0 0.75rem;
+  color: var(--color-muted-foreground);
+  text-align: left;
+  transition: border-color 180ms ease;
+  &:focus-within {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  & input {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    background: transparent;
+    color: var(--color-foreground);
+    outline: 0;
+  }
+  & input::placeholder {
+    color: var(--color-muted-foreground);
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-foreground);
+    }
+  }
+}
+
+/* Riga senza barra di scorrimento visibile (caroselli, chip). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
