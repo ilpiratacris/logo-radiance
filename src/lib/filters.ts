@@ -180,8 +180,17 @@ export function buildFacets(list: Product[]): Facets {
   };
 }
 
-export function activeChips(f: PlpSearch, facets: Facets) {
+/**
+ * Chip dei filtri attivi. `dep` serve a dare un nome alla categoria quando non è tra le
+ * faccette: succede con i gruppi del menu (abbigliamento, calzature, accessori).
+ */
+export function activeChips(f: PlpSearch, facets: Facets, dep: DepartmentSlug = "donna") {
   const chips: { label: string; clear: Partial<PlpSearch> }[] = [];
+  if (f.cat)
+    chips.push({
+      label: facets.categories.find((x) => x.value === f.cat)?.label ?? categoryLabel(dep, f.cat),
+      clear: { cat: undefined },
+    });
   csv(f.brand).forEach((b) =>
     chips.push({
       label: facets.brands.find((x) => x.value === b)?.label ?? b,
@@ -196,7 +205,7 @@ export function activeChips(f: PlpSearch, facets: Facets) {
   );
   csv(f.size).forEach((s) =>
     chips.push({
-      label: `Taglia ${s}`,
+      label: /^taglia\b/i.test(s) ? s : `Taglia ${s}`,
       clear: { size: toCsv(csv(f.size).filter((x) => x !== s)) },
     }),
   );
@@ -210,7 +219,10 @@ export function activeChips(f: PlpSearch, facets: Facets) {
   return chips;
 }
 
+/** Quanti filtri sono attivi: deve coincidere con il numero di chip di `activeChips`. */
 export const countActive = (f: PlpSearch) =>
+  (f.cat ? 1 : 0) +
+  (f.novita === "1" ? 1 : 0) +
   csv(f.brand).length +
   csv(f.color).length +
   csv(f.size).length +

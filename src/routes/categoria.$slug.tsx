@@ -54,8 +54,7 @@ function CategoryPage() {
 
   const onChange = (patch: Partial<PlpSearch>) =>
     navigate({ params: { slug }, search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
-  const onClear = () =>
-    navigate({ params: { slug }, search: { cat: search.cat }, resetScroll: false });
+  const onClear = () => navigate({ params: { slug }, search: {}, resetScroll: false });
 
   const isNew = search.novita === "1";
   const catLabel = search.cat ? categoryLabel(dep, search.cat) : null;

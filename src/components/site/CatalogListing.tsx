@@ -1,5 +1,6 @@
-import { SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { SlidersHorizontal, ArrowUpDown, ChevronDown, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CountDot } from "@/components/site/CountDot";
 import { EmptyState } from "@/components/site/EmptyState";
 import { FilterDrawer, FilterSections } from "@/components/site/FilterDrawer";
 import { Pagination } from "@/components/site/Pagination";
@@ -20,7 +21,16 @@ import type { Product } from "@/lib/catalog";
 const barBtn =
   "flex h-10 flex-1 items-center justify-center gap-2 border border-border-strong text-sm font-medium transition-colors hover:border-foreground hover:bg-surface";
 
-/** Listing prodotti: barra filtri e ordinamento, filtri attivi, pannello desktop, griglia e pagine. */
+/** Altezza della testata desktop: sotto questa quota la barra dei filtri è agganciata. */
+const STUCK_BELOW = 120;
+/** Stessa soglia del breakpoint `lg` di Tailwind, in rem come nel CSS. */
+const DESKTOP = "(min-width: 64rem)";
+
+/**
+ * Listing prodotti: barra con filtri e ordinamento, chip dei filtri attivi, griglia e pagine.
+ * Il pulsante «Filtri» apre il pannello a scomparsa su mobile e, su desktop, il riquadro
+ * sopra la griglia, chiuso finché non lo si chiede.
+ */
 export function CatalogListing({
   all,
   value,
@@ -35,15 +45,29 @@ export function CatalogListing({
   showCategoryFilter?: boolean;
 }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
+  const [desktop, setDesktop] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
+
+  // il riquadro esiste solo su desktop: scendendo sotto la soglia si richiude
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP);
+    const sync = () => {
+      setDesktop(mq.matches);
+      if (!mq.matches) setPanelOpen(false);
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const facets = useMemo(() => {
     const f = buildFacets(all);
     return showCategoryFilter ? f : { ...f, categories: [] };
   }, [all, showCategoryFilter]);
   const results = useMemo(() => applyFilters(all, value), [all, value]);
-  const chips = activeChips(value, facets);
+  const chips = activeChips(value, facets, all[0]?.department);
   const nActive = countActive(value);
   const sortLabel = SORTS.find((s) => s.key === (value.sort ?? "rilevanza"))!.label;
 
@@ -58,6 +82,18 @@ export function CatalogListing({
     topRef.current?.scrollIntoView({ block: "start" });
   };
 
+  const toggleFilters = () => {
+    if (!desktop) {
+      setFiltersOpen(true);
+      return;
+    }
+    // con la barra agganciata il riquadro si aprirebbe fuori vista: si torna in cima al listing
+    const top = topRef.current;
+    if (!panelOpen && top && top.getBoundingClientRect().top < STUCK_BELOW)
+      top.scrollIntoView({ block: "start" });
+    setPanelOpen(!panelOpen);
+  };
+
   return (
     <>
       <div ref={topRef} className="scroll-mt-[102px] lg:scroll-mt-[114px]" />
@@ -67,11 +103,22 @@ export function CatalogListing({
         <div className="container-mb flex h-12 items-center gap-2">
           <button
             type="button"
-            onClick={() => setFiltersOpen(true)}
-            className={`${barBtn} lg:hidden`}
+            onClick={toggleFilters}
+            aria-expanded={desktop ? panelOpen : undefined}
+            aria-haspopup={desktop ? undefined : "dialog"}
+            aria-label={
+              nActive > 0 ? `Filtri, ${nActive} ${nActive === 1 ? "attivo" : "attivi"}` : "Filtri"
+            }
+            className={`${barBtn} lg:flex-none lg:px-5 ${nActive > 0 ? "border-foreground" : ""}`}
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
-            Filtri{nActive > 0 ? ` (${nActive})` : ""}
+            Filtri
+            {nActive > 0 && <CountDot>{nActive}</CountDot>}
+            <ChevronDown
+              className={`hidden h-4 w-4 transition-transform duration-200 lg:block ${panelOpen ? "rotate-180" : ""}`}
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
           </button>
           <button
             type="button"
@@ -88,7 +135,7 @@ export function CatalogListing({
         </div>
 
         {chips.length > 0 && (
-          <div className="container-mb no-scrollbar flex gap-2 overflow-x-auto pb-2">
+          <div className="container-mb no-scrollbar flex gap-2 overflow-x-auto pb-3 pt-1">
             {chips.map((c, i) => (
               <button
                 key={`${c.label}-${i}`}
@@ -112,35 +159,36 @@ export function CatalogListing({
         )}
       </div>
 
-      {/* pannello filtri desktop: sei colonne sopra la griglia */}
-      <section className="container-mb hidden pb-7 pt-5 lg:block" aria-label="Filtri prodotti">
-        <div className="border border-border bg-surface">
-          <div className="flex h-12 items-center justify-between border-b border-border px-4">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
-              Filtra i prodotti{nActive > 0 ? ` (${nActive})` : ""}
-            </div>
-            {nActive > 0 && (
-              <button
-                type="button"
-                onClick={onClear}
-                className="h-11 text-xs font-medium underline underline-offset-4"
-              >
-                Rimuovi tutti
+      {/* riquadro filtri desktop: sei colonne sopra la griglia, aperto dal pulsante della barra */}
+      {panelOpen && (
+        <section className="container-mb hidden pt-5 lg:block" aria-label="Filtri prodotti">
+          <div className="border border-border bg-surface">
+            <FilterSections
+              facets={facets}
+              value={value}
+              onChange={change}
+              desktopGrid
+              defaultOpen="all"
+            />
+            <div className="flex h-14 items-center justify-end gap-5 border-t border-border px-4">
+              {nActive > 0 && (
+                <button
+                  type="button"
+                  onClick={onClear}
+                  className="h-11 text-xs font-medium underline underline-offset-4"
+                >
+                  Rimuovi tutti
+                </button>
+              )}
+              <button type="button" onClick={() => setPanelOpen(false)} className="btn-outline">
+                Mostra {results.length} {results.length === 1 ? "prodotto" : "prodotti"}
               </button>
-            )}
+            </div>
           </div>
-          <FilterSections
-            facets={facets}
-            value={value}
-            onChange={change}
-            desktopGrid
-            defaultOpen="all"
-          />
-        </div>
-      </section>
+        </section>
+      )}
 
-      <div className="container-mb pb-8 pt-4 lg:pb-10 lg:pt-0">
+      <div className="container-mb pb-8 pt-4 lg:pb-10 lg:pt-7">
         {results.length === 0 ? (
           <EmptyState text="Nessun prodotto con questi filtri.">
             <button type="button" onClick={onClear} className="btn-outline">
