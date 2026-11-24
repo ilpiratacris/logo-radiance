@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { BottomSheet } from "@/components/site/BottomSheet";
-import { formatPrice, type Product } from "@/lib/catalog";
+import { ColorThumbs } from "@/components/site/ColorThumbs";
+import { Price } from "@/components/site/Price";
+import { SizeSelector } from "@/components/site/SizeSelector";
+import type { Product } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 
 export function QuickAddSheet({
@@ -26,6 +29,7 @@ export function QuickAddSheet({
       title="Aggiungi rapido"
       footer={
         <button
+          type="button"
           disabled={!size}
           onClick={() => {
             if (!size) return;
@@ -42,7 +46,7 @@ export function QuickAddSheet({
             });
             onClose();
           }}
-          className="btn-primary w-full disabled:opacity-40"
+          className="btn-primary w-full"
         >
           {size ? "Aggiungi al carrello" : "Seleziona la taglia"}
         </button>
@@ -50,61 +54,50 @@ export function QuickAddSheet({
     >
       <div className="p-4">
         <div className="flex gap-3">
-          <img src={variant.image} alt="" width={120} height={160} className="h-28 w-21 bg-background object-contain" />
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.08em]">{product.brand}</div>
+          <img
+            src={variant.image}
+            alt=""
+            width={84}
+            height={112}
+            className="h-28 w-[84px] shrink-0 bg-background object-contain"
+          />
+          <div className="min-w-0">
+            <div className="brand-label">{product.brand}</div>
             <div className="text-sm text-muted-foreground">{product.name}</div>
-            <div className="mt-1 text-sm font-semibold">{formatPrice(product.price)}</div>
+            <Price price={product.price} oldPrice={product.oldPrice} className="mt-1" />
           </div>
         </div>
 
         {product.variants.length > 1 && (
-          <div className="mt-5">
-            <div className="text-xs font-semibold uppercase tracking-[0.12em]">
-              Colore: <span className="font-normal normal-case text-muted-foreground">{variant.label}</span>
+          <div className="mt-5 grid gap-2">
+            <div className="label-caps">
+              Colore{" "}
+              <span className="font-normal normal-case tracking-normal text-muted-foreground">
+                {variant.label}
+              </span>
             </div>
-            <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-              {product.variants.map((v, i) => (
-                <button
-                  key={v.key}
-                  onClick={() => {
-                    setVi(i);
-                    setSize(null);
-                  }}
-                  aria-label={v.label}
-                  aria-pressed={i === vi}
-                  className={`h-16 w-14 shrink-0 overflow-hidden border ${i === vi ? "border-foreground" : "border-border"}`}
-                >
-                  <img src={v.image} alt="" width={56} height={64} className="h-full w-full bg-background object-contain" />
-                </button>
-              ))}
-            </div>
+            <ColorThumbs
+              variants={product.variants}
+              value={vi}
+              size="md"
+              onChange={(i) => {
+                setVi(i);
+                setSize(null);
+              }}
+              className="no-scrollbar overflow-x-auto"
+            />
           </div>
         )}
 
-        <div className="mt-5">
-          <div className="text-xs font-semibold uppercase tracking-[0.12em]">Taglia</div>
-          <div className="mt-2 grid grid-cols-4 gap-2 sm:grid-cols-6">
-            {variant.sizes.map((s) => {
-              const out = s.stock === 0;
-              return (
-                <button
-                  key={s.size}
-                  disabled={out}
-                  onClick={() => setSize(s.size)}
-                  className={`h-11 border text-sm ${
-                    size === s.size
-                      ? "border-foreground bg-foreground text-background"
-                      : out
-                        ? "border-border text-muted-foreground line-through"
-                        : "border-border hover:border-foreground"
-                  }`}
-                >
-                  {s.size}
-                </button>
-              );
-            })}
-          </div>
+        <div className="mt-5 grid gap-2">
+          <div className="label-caps">Taglia</div>
+          <SizeSelector
+            sizes={variant.sizes}
+            selected={size ? [size] : []}
+            onSelect={setSize}
+            columns="grid-cols-4 sm:grid-cols-6"
+            showStock
+          />
         </div>
       </div>
     </BottomSheet>

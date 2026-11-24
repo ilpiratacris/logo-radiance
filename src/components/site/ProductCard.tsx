@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Plus } from "lucide-react";
 import { useState } from "react";
-import { discountOf, formatPrice, type Product } from "@/lib/catalog";
+import { discountOf, type Product } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
+import { ColorThumbs } from "@/components/site/ColorThumbs";
+import { Price } from "@/components/site/Price";
 import { QuickAddSheet } from "@/components/site/QuickAddSheet";
 
 export function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
@@ -19,19 +21,22 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   return (
     <>
       <div className="group relative">
-        <Link
-          to="/prodotto/$slug"
-          params={{ slug: product.slug }}
-          className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-        >
-          <div className="relative aspect-[3/4] overflow-hidden bg-background">
+        {/* Su mobile l'aggiunta rapida sta sulla foto; su desktop compare al passaggio sulla card. */}
+        <div className="relative lg:static">
+          <Link
+            to="/prodotto/$slug"
+            params={{ slug: product.slug }}
+            className="relative block aspect-[3/4] overflow-hidden bg-background"
+          >
             <img
               src={variant.image}
               alt={`${product.brand} ${product.name} — ${variant.label}`}
               loading={priority ? "eager" : "lazy"}
               width={800}
               height={1066}
-              className="h-full w-full object-contain transition-opacity duration-300 md:group-hover:opacity-0"
+              className={`h-full w-full object-contain transition-opacity duration-300 ${
+                variant.altImage ? "md:group-hover:opacity-0" : ""
+              }`}
             />
             {variant.altImage && (
               <img
@@ -45,87 +50,62 @@ export function ProductCard({ product, priority }: { product: Product; priority?
               />
             )}
 
-            {/* max 2 badge */}
-            <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+            {/* al massimo due etichette, allineate al bordo sinistro */}
+            <div className="absolute left-0 top-2 flex flex-col items-stretch gap-1 text-center text-[10px] leading-[15px] text-background">
               {discount > 0 && (
-                <span className="bg-[color:var(--color-sale)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-background">
+                <span className="bg-sale px-1.5 py-0.5 font-semibold tracking-wide">
                   −{discount}%
                 </span>
               )}
               {badge && (
-                <span className="bg-foreground px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-background">
+                <span className="bg-foreground px-1.5 py-0.5 font-medium uppercase tracking-wider">
                   {badge}
-                </span>
-              )}
-            </div>
-          </div>
-        </Link>
-
-        <button
-          aria-label={liked ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
-          aria-pressed={liked}
-          onClick={() => toggleWishlist(product.slug)}
-          className="absolute right-1 top-1 flex h-11 w-11 items-center justify-center"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background/85 backdrop-blur">
-            <Heart
-              className={`h-4 w-4 transition-transform ${liked ? "scale-110 fill-[color:var(--color-sale)] text-[color:var(--color-sale)]" : ""}`}
-              strokeWidth={1.5}
-            />
-          </span>
-        </button>
-
-        {/* Quick add: discreto su mobile, in hover su desktop */}
-        <button
-          onClick={() => setQuickAdd(true)}
-          aria-label={`Aggiungi rapido ${product.name}`}
-          className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-background/90 backdrop-blur transition-opacity md:opacity-0 md:group-hover:opacity-100"
-        >
-          <Plus className="h-4 w-4" strokeWidth={1.75} />
-        </button>
-
-        <div className="pt-2.5">
-          <Link to="/prodotto/$slug" params={{ slug: product.slug }} className="block">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.08em]">{product.brand}</div>
-            <div className="mt-0.5 line-clamp-1 text-[13px] text-muted-foreground">{product.name}</div>
-            <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
-              <span
-                className={`text-sm font-semibold ${discount > 0 ? "text-[color:var(--color-sale)]" : ""}`}
-              >
-                {formatPrice(product.price)}
-              </span>
-              {product.oldPrice && (
-                <span className="text-xs text-muted-foreground line-through">
-                  {formatPrice(product.oldPrice)}
                 </span>
               )}
             </div>
           </Link>
 
-          {/* varianti colore: miniature reali del prodotto */}
+          <button
+            type="button"
+            onClick={() => setQuickAdd(true)}
+            aria-label={`Aggiungi rapido ${product.name}`}
+            className="icon-btn-float card-quick absolute bottom-2 right-2 h-9 w-9"
+          >
+            <Plus className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          aria-label={liked ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+          aria-pressed={liked}
+          onClick={() => toggleWishlist(product.slug)}
+          className="absolute right-1 top-1 flex h-11 w-11 items-center justify-center"
+        >
+          <span className="icon-btn-float h-8 w-8">
+            <Heart
+              className={`h-4 w-4 transition-transform ${liked ? "scale-110 fill-sale text-sale" : ""}`}
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+          </span>
+        </button>
+
+        <div className="pt-2.5">
+          <Link to="/prodotto/$slug" params={{ slug: product.slug }} className="block">
+            <div className="brand-label">{product.brand}</div>
+            <div className="mt-0.5 truncate text-[13px] text-muted-foreground">{product.name}</div>
+            <Price price={product.price} oldPrice={product.oldPrice} className="mt-1.5" />
+          </Link>
+
           {product.variants.length > 1 && (
-            <div className="mt-2 flex items-center gap-1.5">
-              {product.variants.slice(0, 4).map((v, i) => (
-                <button
-                  key={v.key}
-                  onClick={() => setVIndex(i)}
-                  aria-label={`Colore ${v.label}`}
-                  aria-pressed={i === vIndex}
-                  className={`h-8 w-7 overflow-hidden border ${
-                    i === vIndex ? "border-foreground" : "border-border"
-                  }`}
-                >
-                  {v.image ? (
-                    <img src={v.image} alt="" width={56} height={64} loading="lazy" className="h-full w-full object-contain" />
-                  ) : (
-                    <span className="block h-full w-full" style={{ background: v.hex }} />
-                  )}
-                </button>
-              ))}
-              {product.variants.length > 4 && (
-                <span className="text-[11px] text-muted-foreground">+{product.variants.length - 4}</span>
-              )}
-            </div>
+            <ColorThumbs
+              variants={product.variants}
+              value={vIndex}
+              onChange={setVIndex}
+              max={4}
+              className="mt-2"
+            />
           )}
         </div>
       </div>

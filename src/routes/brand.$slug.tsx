@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { Breadcrumb } from "@/components/site/Breadcrumb";
 import { CatalogListing } from "@/components/site/CatalogListing";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
 import { brandBySlug, departments, productsByBrand } from "@/lib/catalog";
-import { validatePlpSearch, type PlpSearch } from "@/lib/filters";
+import { applyFilters, validatePlpSearch, type PlpSearch } from "@/lib/filters";
 
 export const Route = createFileRoute("/brand/$slug")({
   validateSearch: (raw: Record<string, unknown>) => validatePlpSearch(raw),
@@ -15,7 +16,12 @@ export const Route = createFileRoute("/brand/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Brand non trovato — MyBrand Italia" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Brand non trovato — MyBrand Italia" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const title = `${loaderData.name} — collezione ufficiale | MyBrand Italia`;
     const description = `Acquista ${loaderData.name} su MyBrand Italia: abbigliamento, calzature e accessori. Filtra per reparto, taglia e colore.`;
@@ -39,7 +45,7 @@ function BrandNotFound() {
     <SiteLayout>
       <div className="container-mb py-20 text-center">
         <h1 className="text-xl font-semibold">Brand non disponibile</h1>
-        <Link to="/brand" className="btn-primary mt-5 inline-flex">
+        <Link to="/brand" className="btn-primary mt-5">
           Vedi tutti i brand
         </Link>
       </div>
@@ -53,6 +59,7 @@ function BrandPage() {
   const navigate = useNavigate({ from: "/brand/$slug" });
   const brand = brandBySlug(slug)!;
   const all = productsByBrand(slug);
+  const count = applyFilters(all, search).length;
 
   const onChange = (patch: Partial<PlpSearch>) =>
     navigate({ params: { slug }, search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
@@ -62,56 +69,48 @@ function BrandPage() {
 
   return (
     <SiteLayout>
-      <nav aria-label="Breadcrumb" className="container-mb pt-3 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">
-          Home
-        </Link>
-        <span className="px-1.5">/</span>
-        <Link to="/brand" className="hover:text-foreground">
-          Brand
-        </Link>
-        <span className="px-1.5">/</span>
-        <span className="text-foreground">{brand.name}</span>
-      </nav>
-
-      {brand.image && (
-        <div className="relative mt-3">
-          <img
-            src={brand.image}
-            alt={brand.name}
-            width={1600}
-            height={700}
-            className="h-[34vh] w-full object-cover md:h-[38vh]"
-          />
-          <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/70 to-transparent">
-            <div className="container-mb pb-5">
-              <h1 className="text-2xl font-semibold uppercase tracking-[0.1em] text-background md:text-4xl">
-                {brand.name}
-              </h1>
-              {brand.claim && <p className="mt-1 max-w-md text-sm text-background/85">{brand.claim}</p>}
-            </div>
-          </div>
+      <div className="container-mb flex flex-col gap-3 py-4 lg:gap-4 lg:py-5">
+        <Breadcrumb
+          items={[
+            { label: "Home", to: "/" },
+            { label: "Brand", to: "/brand" },
+            { label: brand.name },
+          ]}
+        />
+        <div className="flex flex-col gap-1.5 lg:gap-2">
+          {brand.logo && (
+            <img
+              src={brand.logo}
+              alt=""
+              className="mb-1 h-9 w-auto max-w-[180px] self-start object-contain object-left brightness-0 lg:h-10"
+            />
+          )}
+          <h1 className="text-2xl font-semibold leading-8 tracking-tight lg:text-3xl lg:leading-9">
+            {brand.name}
+          </h1>
+          <p className="max-w-[640px] text-sm leading-5 text-muted-foreground">
+            {brand.claim && <span className="max-lg:hidden">{brand.claim} </span>}
+            <span className={brand.claim ? "lg:hidden" : ""}>
+              {count} {count === 1 ? "prodotto" : "prodotti"}
+            </span>
+          </p>
         </div>
-      )}
-      {!brand.image && (
-        <h1 className="container-mb pt-2 text-2xl font-semibold uppercase tracking-[0.1em] md:text-3xl">
-          {brand.name}
-        </h1>
-      )}
 
-      <div className="container-mb flex flex-wrap items-center gap-2 py-4">
-        <span className="text-xs text-muted-foreground">{all.length} prodotti ·</span>
-        {deps.map((d) => (
-          <Link
-            key={d.slug}
-            to="/categoria/$slug"
-            params={{ slug: d.slug }}
-            search={{ brand: slug }}
-            className="flex h-10 items-center border border-border px-3 text-xs font-medium"
-          >
-            {brand.name} {d.label}
-          </Link>
-        ))}
+        {deps.length > 1 && (
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+            {deps.map((d) => (
+              <Link
+                key={d.slug}
+                to="/categoria/$slug"
+                params={{ slug: d.slug }}
+                search={{ brand: slug }}
+                className="chip"
+              >
+                {brand.name} {d.label.toLowerCase()}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />

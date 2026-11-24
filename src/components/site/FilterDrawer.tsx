@@ -1,6 +1,7 @@
 import { ChevronDown, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { BottomSheet } from "@/components/site/BottomSheet";
+import { SizeSelector } from "@/components/site/SizeSelector";
 import { csv, toCsv, type Facets, type PlpSearch } from "@/lib/filters";
 
 type Props = {
@@ -13,7 +14,16 @@ type Props = {
   onClear: () => void;
 };
 
-export function FilterDrawer({ open, onClose, facets, value, resultCount, onChange, onClear }: Props) {
+/** Filtri su mobile: pannello a tutto schermo aperto dal pulsante della barra. */
+export function FilterDrawer({
+  open,
+  onClose,
+  facets,
+  value,
+  resultCount,
+  onChange,
+  onClear,
+}: Props) {
   return (
     <BottomSheet
       open={open}
@@ -22,11 +32,15 @@ export function FilterDrawer({ open, onClose, facets, value, resultCount, onChan
       full
       footer={
         <div className="flex gap-2">
-          <button onClick={onClear} className="btn-outline flex-1">
+          <button
+            type="button"
+            onClick={onClear}
+            className="btn-outline shrink-0 whitespace-nowrap px-4"
+          >
             Rimuovi tutti
           </button>
-          <button onClick={onClose} className="btn-primary flex-[2]">
-            Mostra {resultCount} prodotti
+          <button type="button" onClick={onClose} className="btn-primary min-w-0 flex-1">
+            Mostra {resultCount} {resultCount === 1 ? "prodotto" : "prodotti"}
           </button>
         </div>
       }
@@ -36,6 +50,51 @@ export function FilterDrawer({ open, onClose, facets, value, resultCount, onChan
   );
 }
 
+const SECTION_IDS = ["cat", "brand", "size", "color", "price", "promo"];
+
+function Section({
+  label,
+  open,
+  onToggle,
+  grid,
+  children,
+}: {
+  label: string;
+  open: boolean;
+  onToggle: () => void;
+  grid: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={
+        grid
+          ? "min-w-0 border-r border-border px-4 last:border-r-0 max-xl:border-b max-xl:[&:nth-child(3n)]:border-r-0 max-xl:[&:nth-last-child(-n+3)]:border-b-0"
+          : "border-b border-border"
+      }
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className={`flex h-14 w-full items-center justify-between text-left text-sm font-semibold ${grid ? "px-0" : "px-4"}`}
+      >
+        {label}
+        <ChevronDown
+          className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
+      </button>
+      {open && <div className={grid ? "pb-5" : "px-4 pb-5"}>{children}</div>}
+    </div>
+  );
+}
+
+/**
+ * Sezioni dei filtri. In colonna nel pannello mobile; su desktop (`desktopGrid`)
+ * affiancate in sei colonne dentro il riquadro sopra la griglia.
+ */
 export function FilterSections({
   facets,
   value,
@@ -46,15 +105,19 @@ export function FilterSections({
   facets: Facets;
   value: PlpSearch;
   onChange: (patch: Partial<PlpSearch>) => void;
+  /** id della sezione aperta all'avvio, oppure "all" */
   defaultOpen?: string;
   desktopGrid?: boolean;
 }) {
-  const sectionIds = ["cat", "brand", "size", "color", "price", "promo"];
   const [openSections, setOpenSections] = useState<string[]>(
-    defaultOpen === "all" ? sectionIds : defaultOpen ? [defaultOpen] : [],
+    defaultOpen === "all" ? SECTION_IDS : defaultOpen ? [defaultOpen] : [],
   );
   const [brandQuery, setBrandQuery] = useState("");
   const [showAllBrands, setShowAllBrands] = useState(false);
+
+  const isOpen = (id: string) => openSections.includes(id);
+  const toggle = (id: string) =>
+    setOpenSections((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
   const toggleIn = (key: "brand" | "size" | "color", v: string) => {
     const cur = csv(value[key]);
@@ -66,52 +129,51 @@ export function FilterSections({
     b.label.toLowerCase().includes(brandQuery.trim().toLowerCase()),
   );
   const visibleBrands = showAllBrands || brandQuery ? brandList : brandList.slice(0, 6);
-
-  const Section = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => {
-    const isOpen = openSections.includes(id);
-    return (
-    <div className={desktopGrid ? "min-w-0 border-r border-border px-4 last:border-r-0" : "border-b border-border"}>
-      <button
-        onClick={() => setOpenSections((current) => isOpen ? current.filter((item) => item !== id) : [...current, id])}
-        aria-expanded={isOpen}
-        className={`flex h-14 w-full items-center justify-between text-sm font-semibold ${desktopGrid ? "px-0" : "px-4"}`}
-      >
-        {label}
-        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} strokeWidth={1.5} />
-      </button>
-      {isOpen && <div className={desktopGrid ? "pb-5" : "px-4 pb-5"}>{children}</div>}
-    </div>
-    );
-  };
+  const section = (id: string) => ({
+    open: isOpen(id),
+    onToggle: () => toggle(id),
+    grid: desktopGrid,
+  });
 
   return (
     <div className={desktopGrid ? "grid grid-cols-3 xl:grid-cols-6" : ""}>
       {facets.categories.length > 1 && (
-        <Section id="cat" label="Categoria">
+        <Section label="Categoria" {...section("cat")}>
           <div className="flex flex-wrap gap-2">
-            <Chip active={!value.cat} onClick={() => onChange({ cat: undefined })}>
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={!value.cat}
+              onClick={() => onChange({ cat: undefined })}
+            >
               Tutte
-            </Chip>
+            </button>
             {facets.categories.map((c) => (
-              <Chip key={c.value} active={value.cat === c.value} onClick={() => onChange({ cat: c.value })}>
-                <span className="capitalize">{c.label}</span> <span className="text-muted-foreground">({c.count})</span>
-              </Chip>
+              <button
+                key={c.value}
+                type="button"
+                className="chip"
+                aria-pressed={value.cat === c.value}
+                onClick={() => onChange({ cat: c.value })}
+              >
+                <span>{c.label}</span>
+                <span className="opacity-60">({c.count})</span>
+              </button>
             ))}
           </div>
         </Section>
       )}
 
-      <Section id="brand" label="Brand">
-        <div className="mb-3 flex h-11 items-center gap-2 border border-border px-3">
-          <Search className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+      <Section label="Brand" {...section("brand")}>
+        <label className="search-box mb-3 h-11 border-border text-sm">
+          <Search className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
           <input
             value={brandQuery}
             onChange={(e) => setBrandQuery(e.target.value)}
             placeholder="Cerca brand"
             aria-label="Cerca brand"
-            className="h-full w-full bg-transparent text-sm outline-none"
           />
-        </div>
+        </label>
         <ul>
           {visibleBrands.map((b) => (
             <li key={b.value}>
@@ -120,61 +182,67 @@ export function FilterSections({
                   type="checkbox"
                   checked={csv(value.brand).includes(b.value)}
                   onChange={() => toggleIn("brand", b.value)}
-                  className="h-4 w-4 accent-[color:var(--color-foreground)]"
+                  className="h-4 w-4 shrink-0 accent-foreground"
                 />
-                <span className="flex-1">{b.label}</span>
+                <span className="min-w-0 flex-1 truncate">{b.label}</span>
                 <span className="text-xs text-muted-foreground">{b.count}</span>
               </label>
             </li>
           ))}
         </ul>
         {!showAllBrands && !brandQuery && brandList.length > 6 && (
-          <button onClick={() => setShowAllBrands(true)} className="mt-2 text-xs font-medium underline underline-offset-4">
+          <button
+            type="button"
+            onClick={() => setShowAllBrands(true)}
+            className="mt-2 text-xs font-medium underline underline-offset-4"
+          >
             Mostra altri ({brandList.length - 6})
           </button>
         )}
       </Section>
 
       {facets.sizes.length > 0 && (
-        <Section id="size" label="Taglia">
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-            {facets.sizes.map((s) => (
-              <button
-                key={s.value}
-                onClick={() => toggleIn("size", s.value)}
-                aria-pressed={csv(value.size).includes(s.value)}
-                className={`h-11 border text-sm ${
-                  csv(value.size).includes(s.value)
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border hover:border-foreground"
-                }`}
-              >
-                {s.value}
-              </button>
-            ))}
-          </div>
+        <Section label="Taglia" {...section("size")}>
+          <SizeSelector
+            sizes={facets.sizes.map((s) => ({ size: s.value }))}
+            selected={csv(value.size)}
+            onSelect={(s) => toggleIn("size", s)}
+            columns={
+              desktopGrid ? "grid-cols-3 min-[1400px]:grid-cols-6" : "grid-cols-4 sm:grid-cols-6"
+            }
+          />
         </Section>
       )}
 
-      <Section id="color" label="Colore">
-        <div className="grid grid-cols-2 gap-2">
-          {facets.colors.map((c) => (
-            <button
-              key={c.value}
-              onClick={() => toggleIn("color", c.value)}
-              aria-pressed={csv(value.color).includes(c.value)}
-              className={`flex h-11 items-center gap-2 border px-2 text-sm ${
-                csv(value.color).includes(c.value) ? "border-foreground" : "border-border"
-              }`}
-            >
-              <span className="h-5 w-5 rounded-full border border-border" style={{ background: c.hex }} />
-              {c.label}
-            </button>
-          ))}
+      <Section label="Colore" {...section("color")}>
+        {/* nel pannello a 6 colonne i nomi lunghi non stanno in due colonne */}
+        <div className={`grid grid-cols-2 gap-2 ${desktopGrid ? "xl:grid-cols-1" : ""}`}>
+          {facets.colors.map((c) => {
+            const on = csv(value.color).includes(c.value);
+            return (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => toggleIn("color", c.value)}
+                aria-pressed={on}
+                className={`flex h-11 min-w-0 items-center gap-2 border px-2 text-left text-sm transition-colors ${
+                  on
+                    ? "border-foreground"
+                    : "border-border hover:border-foreground hover:bg-background"
+                }`}
+              >
+                <span
+                  className="h-5 w-5 shrink-0 rounded-full border border-border"
+                  style={{ background: c.hex }}
+                />
+                <span className="truncate">{c.label}</span>
+              </button>
+            );
+          })}
         </div>
       </Section>
 
-      <Section id="price" label="Prezzo">
+      <Section label="Prezzo" {...section("price")}>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -183,7 +251,7 @@ export function FilterSections({
             value={value.min ?? ""}
             onChange={(e) => onChange({ min: e.target.value || undefined })}
             aria-label="Prezzo minimo"
-            className="h-11 w-full border border-border px-3 text-sm"
+            className="field"
           />
           <span className="text-muted-foreground">–</span>
           <input
@@ -193,45 +261,23 @@ export function FilterSections({
             value={value.max ?? ""}
             onChange={(e) => onChange({ max: e.target.value || undefined })}
             aria-label="Prezzo massimo"
-            className="h-11 w-full border border-border px-3 text-sm"
+            className="field"
           />
         </div>
       </Section>
 
-      <Section id="promo" label="Sconto">
-        <label className="flex h-11 cursor-pointer items-center gap-3 text-sm">
+      <Section label="Sconto" {...section("promo")}>
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
           <input
             type="checkbox"
             checked={value.sconto === "1"}
             onChange={(e) => onChange({ sconto: e.target.checked ? "1" : undefined })}
-            className="h-4 w-4"
+            className="h-4 w-4 shrink-0 accent-foreground"
           />
-          Solo prodotti in promozione
-          <span className="ml-auto text-xs text-muted-foreground">{facets.discounted}</span>
+          <span className="flex-1">Solo prodotti in promozione</span>
+          <span className="text-xs text-muted-foreground">{facets.discounted}</span>
         </label>
       </Section>
     </div>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active?: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-pressed={active}
-      className={`flex h-10 items-center gap-1 border px-3 text-sm ${
-        active ? "border-foreground bg-foreground text-background" : "border-border"
-      }`}
-    >
-      {children}
-    </button>
   );
 }

@@ -27,7 +27,11 @@ export function MegaMenu({
               {b.name}
             </Link>
           ))}
-          <Link to="/brand" onClick={onNavigate} className="py-1.5 text-sm font-semibold underline underline-offset-4">
+          <Link
+            to="/brand"
+            onClick={onNavigate}
+            className="py-1.5 text-sm font-semibold underline underline-offset-4"
+          >
             Vedi tutti i brand
           </Link>
         </div>
@@ -50,9 +54,9 @@ export function MegaMenu({
             to="/promo/$slug"
             params={{ slug: "promo-autunno" }}
             onClick={onNavigate}
-            className="block py-1.5 text-sm font-semibold text-[color:var(--color-sale)]"
+            className="block py-1.5 text-sm font-semibold text-sale"
           >
-            Promo d'autunno — fino al -40%
+            Promo d’autunno — fino al −40%
           </Link>
           <Link
             to="/categoria/$slug"
@@ -113,7 +117,13 @@ export function MegaMenu({
         ))}
       </div>
       <Visual
-        image={department === "donna" ? IMG.catDonna : department === "uomo" ? IMG.catUomo : IMG.catBambino}
+        image={
+          department === "donna"
+            ? IMG.catDonna
+            : department === "uomo"
+              ? IMG.catUomo
+              : IMG.catBambino
+        }
         label="Nuova stagione"
         title="Autunno / Inverno 2026"
         to={{ to: "/categoria/$slug", params: { slug: department }, search: { novita: "1" } }}
@@ -152,9 +162,18 @@ function Visual({
       onClick={onNavigate}
       className="group relative hidden w-64 shrink-0 overflow-hidden xl:block"
     >
-      <img src={image} alt="" width={512} height={320} loading="lazy" className="h-40 w-full object-cover" />
+      <img
+        src={image}
+        alt=""
+        width={512}
+        height={320}
+        loading="lazy"
+        className="h-40 w-full object-cover"
+      />
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 to-transparent p-3">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-background/80">{label}</div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-background/80">
+          {label}
+        </div>
         <div className="text-sm font-semibold text-background">{title}</div>
       </div>
     </Link>

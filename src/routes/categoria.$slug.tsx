@@ -1,16 +1,17 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { Breadcrumb, type Crumb } from "@/components/site/Breadcrumb";
 import { CatalogListing } from "@/components/site/CatalogListing";
 import {
+  categoryCopy,
   categoryLabel,
   departments,
-  navTree,
   productsByDepartment,
   type DepartmentSlug,
 } from "@/lib/catalog";
-import { validatePlpSearch, type PlpSearch } from "@/lib/filters";
+import { applyFilters, validatePlpSearch, type PlpSearch } from "@/lib/filters";
 import { useStore } from "@/lib/store";
-import { useEffect } from "react";
 
 const isDep = (s: string): s is DepartmentSlug => departments.some((d) => d.slug === s);
 
@@ -49,69 +50,46 @@ function CategoryPage() {
   }, [slug, department, setDepartment]);
 
   const all = productsByDepartment(dep);
-  const subCats = navTree[dep].flatMap((g) => g.items).slice(0, 14);
+  const count = applyFilters(all, search).length;
 
   const onChange = (patch: Partial<PlpSearch>) =>
     navigate({ params: { slug }, search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
-  const onClear = () => navigate({ params: { slug }, search: { cat: search.cat }, resetScroll: false });
+  const onClear = () =>
+    navigate({ params: { slug }, search: { cat: search.cat }, resetScroll: false });
 
-  const heading = search.novita === "1"
-    ? `Novità ${depLabel}`
-    : search.cat
-      ? `${categoryLabel(dep, search.cat)} ${depLabel}`
+  const isNew = search.novita === "1";
+  const catLabel = search.cat ? categoryLabel(dep, search.cat) : null;
+  const heading = isNew
+    ? `Novità ${depLabel.toLowerCase()}`
+    : catLabel
+      ? `${catLabel} ${depLabel.toLowerCase()}`
       : depLabel;
+  const intro = isNew
+    ? "Gli ultimi arrivi dei brand selezionati per la stagione."
+    : categoryCopy(dep, search.cat).short;
+
+  const crumbs: Crumb[] = [
+    { label: "Home", to: "/" },
+    { label: depLabel, to: "/categoria/$slug", params: { slug: dep } },
+  ];
+  if (isNew) crumbs.push({ label: "Novità" });
+  else if (catLabel) crumbs.push({ label: catLabel });
 
   return (
     <SiteLayout>
-      {/* breadcrumb */}
-      <nav aria-label="Breadcrumb" className="container-mb pt-3 text-xs text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">
-          Home
-        </Link>
-        <span className="px-1.5">/</span>
-        <Link to="/categoria/$slug" params={{ slug: dep }} className="hover:text-foreground">
-          {depLabel}
-        </Link>
-        {search.cat && (
-          <>
-            <span className="px-1.5">/</span>
-            <span className="text-foreground">{categoryLabel(dep, search.cat)}</span>
-          </>
-        )}
-      </nav>
-
-      <header className="container-mb pt-2 pb-4">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{heading}</h1>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {all.length} prodotti · PLACEHOLDER: conteggio reale dal catalogo
-        </p>
-      </header>
-
-      {/* sottocategorie: fila scrollabile su mobile */}
-      <div className="flex gap-2 overflow-x-auto px-4 pb-4 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <Link
-          to="/categoria/$slug"
-          params={{ slug: dep }}
-          search={{}}
-          className={`flex h-10 shrink-0 items-center border px-3 text-xs font-medium ${
-            !search.cat ? "border-foreground bg-foreground text-background" : "border-border"
-          }`}
-        >
-          Tutto
-        </Link>
-        {subCats.map((c) => (
-          <Link
-            key={c.slug}
-            to="/categoria/$slug"
-            params={{ slug: dep }}
-            search={{ cat: c.slug }}
-            className={`flex h-10 shrink-0 items-center border px-3 text-xs font-medium ${
-              search.cat === c.slug ? "border-foreground bg-foreground text-background" : "border-border"
-            }`}
-          >
-            {c.label}
-          </Link>
-        ))}
+      <div className="container-mb flex flex-col gap-3 py-4 lg:gap-4 lg:py-5">
+        <Breadcrumb items={crumbs} />
+        <div className="flex flex-col gap-1.5 lg:gap-2">
+          <h1 className="text-2xl font-semibold leading-8 tracking-tight lg:text-3xl lg:leading-9">
+            {heading}
+          </h1>
+          <p className="text-sm leading-5 text-muted-foreground lg:hidden">
+            {count} {count === 1 ? "prodotto" : "prodotti"}
+          </p>
+          <p className="hidden max-w-[640px] text-sm leading-5 text-muted-foreground lg:block">
+            {intro}
+          </p>
+        </div>
       </div>
 
       <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />

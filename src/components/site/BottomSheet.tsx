@@ -12,7 +12,15 @@ type Props = {
   footer?: ReactNode;
 };
 
-export function BottomSheet({ open, onClose, title, children, full, side = "bottom", footer }: Props) {
+export function BottomSheet({
+  open,
+  onClose,
+  title,
+  children,
+  full,
+  side = "bottom",
+  footer,
+}: Props) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -40,15 +48,11 @@ export function BottomSheet({ open, onClose, title, children, full, side = "bott
         onClick={onClose}
         className="absolute inset-0 h-full w-full cursor-default bg-foreground/40 backdrop-blur-[1px]"
       />
-      <div className={`${panel} flex flex-col bg-background shadow-[0_-4px_24px_rgba(0,0,0,0.12)]`}>
+      <div className={`${panel} flex flex-col bg-background shadow-sheet`}>
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
           <span className="text-sm font-semibold uppercase tracking-[0.12em]">{title}</span>
-          <button
-            onClick={onClose}
-            aria-label="Chiudi"
-            className="-mr-2 flex h-11 w-11 items-center justify-center"
-          >
-            <X className="h-5 w-5" strokeWidth={1.5} />
+          <button type="button" onClick={onClose} aria-label="Chiudi" className="icon-btn -mr-2">
+            <X className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{children}</div>

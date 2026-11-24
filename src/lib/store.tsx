@@ -39,6 +39,8 @@ type Store = {
   removeLine: (i: number) => void;
   cartCount: number;
   cartTotal: number;
+  /** Risparmio complessivo delle righe in offerta (prezzo pieno − prezzo ridotto). */
+  cartDiscount: number;
 
   cartOpen: boolean;
   openCart: () => void;
@@ -142,11 +144,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addToCart,
       setQty: (i, qty) =>
         setCart((c) =>
-          qty <= 0 ? c.filter((_, idx) => idx !== i) : c.map((l, idx) => (idx === i ? { ...l, qty } : l)),
+          qty <= 0
+            ? c.filter((_, idx) => idx !== i)
+            : c.map((l, idx) => (idx === i ? { ...l, qty } : l)),
         ),
       removeLine: (i) => setCart((c) => c.filter((_, idx) => idx !== i)),
       cartCount: cart.reduce((n, l) => n + l.qty, 0),
       cartTotal: cart.reduce((n, l) => n + l.qty * l.price, 0),
+      cartDiscount: cart.reduce(
+        (n, l) => n + (l.oldPrice && l.oldPrice > l.price ? (l.oldPrice - l.price) * l.qty : 0),
+        0,
+      ),
       cartOpen,
       openCart: () => setCartOpen(true),
       closeCart: () => setCartOpen(false),
@@ -154,7 +162,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       searchOpen,
       setSearchOpen,
     }),
-    [hydrated, department, wishlist, recent, cart, cartOpen, searchOpen, lastAdded, addToCart, pushRecent, toggleWishlist],
+    [
+      hydrated,
+      department,
+      wishlist,
+      recent,
+      cart,
+      cartOpen,
+      searchOpen,
+      lastAdded,
+      addToCart,
+      pushRecent,
+      toggleWishlist,
+    ],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

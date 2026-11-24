@@ -46,24 +46,33 @@ export function SearchOverlay() {
   if (!searchOpen) return null;
 
   const empty = q.trim().length < 2;
-  const nothing = !empty && !results.brands.length && !results.products.length && !results.categories.length;
+  const nothing =
+    !empty && !results.brands.length && !results.products.length && !results.categories.length;
 
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-background" role="dialog" aria-modal="true" aria-label="Ricerca">
+    <div
+      className="fixed inset-0 z-[80] flex flex-col bg-background"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Ricerca"
+    >
       <div className="border-b border-border">
         <div className="container-mb flex h-16 items-center gap-2">
-          <div className="flex h-12 flex-1 items-center gap-2 border border-border-strong px-3">
-            <Search className="h-5 w-5 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+          <div className="search-box h-12 flex-1 text-base">
+            <Search className="h-5 w-5 shrink-0" strokeWidth={1.5} aria-hidden="true" />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Cerca prodotti, brand, categorie…"
+              placeholder="Cerca prodotti, brand…"
               aria-label="Cerca"
-              className="h-full w-full bg-transparent text-base outline-none"
             />
             {q && (
-              <button onClick={() => setQ("")} aria-label="Cancella" className="flex h-11 w-8 items-center justify-center">
+              <button
+                onClick={() => setQ("")}
+                aria-label="Cancella"
+                className="flex h-11 w-8 items-center justify-center"
+              >
                 <X className="h-4 w-4" strokeWidth={1.5} />
               </button>
             )}
@@ -83,8 +92,18 @@ export function SearchOverlay() {
                   <Title>Ultime ricerche</Title>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {recent.map((r) => (
-                      <button key={r} onClick={() => setQ(r)} className="flex h-10 items-center gap-1.5 border border-border px-3 text-sm">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /> {r}
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setQ(r)}
+                        className="chip gap-1.5"
+                      >
+                        <Clock
+                          className="h-3.5 w-3.5 text-muted-foreground"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />{" "}
+                        {r}
                       </button>
                     ))}
                   </div>
@@ -94,7 +113,7 @@ export function SearchOverlay() {
                 <Title>Ricerche popolari</Title>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {popularSearches.map((r) => (
-                    <button key={r} onClick={() => setQ(r)} className="h-10 border border-border px-3 text-sm">
+                    <button key={r} type="button" onClick={() => setQ(r)} className="chip">
                       {r}
                     </button>
                   ))}
@@ -143,7 +162,7 @@ export function SearchOverlay() {
                         params={{ slug: c.dep }}
                         search={{ cat: c.slug }}
                         onClick={close}
-                        className="flex h-10 items-center border border-border px-3 text-sm capitalize"
+                        className="chip capitalize"
                       >
                         {c.label}
                       </Link>
@@ -173,9 +192,15 @@ export function SearchOverlay() {
                             className="h-20 w-16 shrink-0 object-cover"
                           />
                           <span className="min-w-0">
-                            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em]">{p.brand}</span>
-                            <span className="block truncate text-sm text-muted-foreground">{p.name}</span>
-                            <span className="block text-sm font-semibold">{formatPrice(p.price)}</span>
+                            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em]">
+                              {p.brand}
+                            </span>
+                            <span className="block truncate text-sm text-muted-foreground">
+                              {p.name}
+                            </span>
+                            <span className="block text-sm font-semibold">
+                              {formatPrice(p.price)}
+                            </span>
                           </span>
                         </Link>
                       </li>
@@ -192,5 +217,9 @@ export function SearchOverlay() {
 }
 
 function Title({ children }: { children: React.ReactNode }) {
-  return <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{children}</div>;
+  return (
+    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      {children}
+    </div>
+  );
 }

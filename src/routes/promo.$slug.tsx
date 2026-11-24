@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { CatalogListing } from "@/components/site/CatalogListing";
+import { PromoLabel } from "@/components/site/PromoBanner";
 import { RecentlyViewed } from "@/components/site/RecentlyViewed";
 import { TrustBar } from "@/components/site/TrustBar";
 import { campaigns, promoProducts } from "@/lib/catalog";
@@ -15,7 +16,12 @@ export const Route = createFileRoute("/promo/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Promozione non disponibile — MyBrand Italia" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Promozione non disponibile — MyBrand Italia" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const title = `${loaderData.label} — ${loaderData.headline} | MyBrand Italia`;
     return {
@@ -33,7 +39,7 @@ export const Route = createFileRoute("/promo/$slug")({
     <SiteLayout>
       <div className="container-mb py-20 text-center">
         <h1 className="text-xl font-semibold">Promozione non disponibile</h1>
-        <Link to="/" className="btn-primary mt-5 inline-flex">
+        <Link to="/" className="btn-primary mt-5">
           Torna alla home
         </Link>
       </div>
@@ -55,45 +61,49 @@ function PromoPage() {
 
   return (
     <SiteLayout>
-      {/* hero compatto: i prodotti restano vicini */}
-      <div className="relative">
+      {/* apertura compatta: i prodotti restano vicini */}
+      <section className="relative">
         <picture>
-          {campaign.imageMobile && <source media="(max-width: 767px)" srcSet={campaign.imageMobile} />}
+          {campaign.imageMobile && (
+            <source media="(max-width: 767px)" srcSet={campaign.imageMobile} />
+          )}
           <img
             src={campaign.image}
-            alt={campaign.headline}
+            alt=""
             width={1600}
             height={700}
-            className="h-[30vh] w-full object-cover md:h-[34vh]"
+            fetchPriority="high"
+            className="h-[260px] w-full object-cover md:h-[320px]"
           />
         </picture>
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-foreground/75 to-transparent">
-          <div className="container-mb pb-4">
-            <span className="inline-flex h-6 items-center bg-[color:var(--color-sale)] px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-background">
-              {campaign.label}
-            </span>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-background md:text-4xl">
+          <div className="container-mb pb-5 md:pb-8">
+            <PromoLabel>{campaign.label}</PromoLabel>
+            <h1 className="mt-2 max-w-xl text-2xl font-semibold leading-8 tracking-tight text-background md:text-4xl md:leading-10">
               {campaign.headline}
             </h1>
-            <p className="mt-1 max-w-lg text-sm text-background/85">{campaign.copy}</p>
+            <p className="mt-1 max-w-md text-sm text-background">{campaign.copy}</p>
           </div>
         </div>
-      </div>
+      </section>
 
       {campaign.quickCats && (
-        <div className="flex gap-2 overflow-x-auto px-4 py-4 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav
+          aria-label="Categorie in promozione"
+          className="container-mb no-scrollbar flex gap-2 overflow-x-auto py-4 md:flex-wrap"
+        >
           {campaign.quickCats.map((c) => (
             <Link
               key={`${c.dep}-${c.slug}`}
               to="/categoria/$slug"
               params={{ slug: c.dep }}
               search={{ cat: c.slug, sconto: "1" }}
-              className="flex h-10 shrink-0 items-center border border-border px-3 text-xs font-medium"
+              className="chip"
             >
               {c.label} {c.dep}
             </Link>
           ))}
-        </div>
+        </nav>
       )}
 
       <CatalogListing all={all} value={search} onChange={onChange} onClear={onClear} />

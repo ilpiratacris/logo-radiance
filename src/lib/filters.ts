@@ -1,4 +1,10 @@
-import { COLORS, discountOf, type Product } from "@/lib/catalog";
+import {
+  categoryLabel,
+  COLORS,
+  discountOf,
+  type DepartmentSlug,
+  type Product,
+} from "@/lib/catalog";
 
 export type PlpSearch = {
   cat?: string;
@@ -10,7 +16,11 @@ export type PlpSearch = {
   max?: string;
   sort?: SortKey;
   novita?: string;
+  page?: string; // pagina dei risultati, da 1
 };
+
+/** Prodotti per pagina nei listing. */
+export const PAGE_SIZE = 12;
 
 export type SortKey = "rilevanza" | "novita" | "venduti" | "prezzo-asc" | "prezzo-desc" | "sconto";
 
@@ -27,7 +37,12 @@ export const csv = (v?: string) => (v ? v.split(",").filter(Boolean) : []);
 export const toCsv = (arr: string[]) => (arr.length ? arr.join(",") : undefined);
 
 export function validatePlpSearch(raw: Record<string, unknown>): PlpSearch {
-  const s = (k: string) => (typeof raw[k] === "string" && raw[k] ? (raw[k] as string) : undefined);
+  // il router legge i valori come JSON: `?page=2` arriva come numero, `?page="2"` come stringa
+  const s = (k: string) => {
+    const v = raw[k];
+    if (typeof v === "number" && Number.isFinite(v)) return String(v);
+    return typeof v === "string" && v ? v : undefined;
+  };
   const sort = s("sort") as SortKey | undefined;
   return {
     cat: s("cat"),
@@ -38,6 +53,7 @@ export function validatePlpSearch(raw: Record<string, unknown>): PlpSearch {
     min: s("min"),
     max: s("max"),
     novita: s("novita"),
+    page: /^[1-9]\d*$/.test(s("page") ?? "") && s("page") !== "1" ? s("page") : undefined,
     sort: SORTS.some((x) => x.key === sort) ? sort : undefined,
   };
 }
@@ -56,7 +72,10 @@ export function applyFilters(list: Product[], f: PlpSearch): Product[] {
     if (f.novita === "1" && !p.newIn) return false;
     if (brandSel.length && !brandSel.includes(slugOfBrand(p.brand))) return false;
     if (colorSel.length && !p.variants.some((v) => colorSel.includes(v.key))) return false;
-    if (sizeSel.length && !p.variants.some((v) => v.sizes.some((s) => s.stock > 0 && sizeSel.includes(s.size))))
+    if (
+      sizeSel.length &&
+      !p.variants.some((v) => v.sizes.some((s) => s.stock > 0 && sizeSel.includes(s.size)))
+    )
       return false;
     if (f.sconto === "1" && !p.oldPrice) return false;
     if (min !== undefined && p.price < min) return false;
@@ -95,9 +114,27 @@ export type Facets = {
   priceRange: [number, number];
 };
 
+const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+
+/** Ordine delle taglie nei filtri: lettere (XS→XXL), numeri, età bimbo («4A»), poi il resto. */
+function sizeRank(size: string): [number, number] {
+  const letter = LETTER_SIZES.indexOf(size.toUpperCase());
+  if (letter >= 0) return [0, letter];
+  if (/^\d+([.,]\d+)?$/.test(size)) return [1, parseFloat(size.replace(",", "."))];
+  if (/^\d+\s*A$/i.test(size)) return [2, parseInt(size, 10)];
+  return [3, 0];
+}
+
+function compareSizes(a: string, b: string): number {
+  const [ga, na] = sizeRank(a);
+  const [gb, nb] = sizeRank(b);
+  return ga - gb || na - nb || a.localeCompare(b);
+}
+
 /** Costruisce i facet solo sui valori realmente disponibili nella lista corrente. */
 export function buildFacets(list: Product[]): Facets {
   const cat = new Map<string, number>();
+  const catDep = new Map<string, DepartmentSlug>();
   const br = new Map<string, number>();
   const sz = new Map<string, number>();
   const col = new Map<string, number>();
@@ -107,6 +144,7 @@ export function buildFacets(list: Product[]): Facets {
 
   list.forEach((p) => {
     cat.set(p.category, (cat.get(p.category) ?? 0) + 1);
+    if (!catDep.has(p.category)) catDep.set(p.category, p.department);
     br.set(p.brand, (br.get(p.brand) ?? 0) + 1);
     p.variants.forEach((v) => {
       col.set(v.key, (col.get(v.key) ?? 0) + 1);
@@ -119,12 +157,18 @@ export function buildFacets(list: Product[]): Facets {
 
   return {
     categories: [...cat.entries()]
-      .map(([value, count]) => ({ value, label: value.replace(/-/g, " "), count }))
+      .map(([value, count]) => ({
+        value,
+        label: categoryLabel(catDep.get(value) ?? "donna", value),
+        count,
+      }))
       .sort((a, b) => b.count - a.count),
     brands: [...br.entries()]
       .map(([label, count]) => ({ value: slugOfBrand(label), label, count }))
       .sort((a, b) => a.label.localeCompare(b.label)),
-    sizes: [...sz.entries()].map(([value, count]) => ({ value, count })),
+    sizes: [...sz.entries()]
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => compareSizes(a.value, b.value)),
     colors: [...col.entries()].map(([value, count]) => ({
       value,
       label: COLORS[value]?.label ?? value,
@@ -145,10 +189,16 @@ export function activeChips(f: PlpSearch, facets: Facets) {
     }),
   );
   csv(f.color).forEach((c) =>
-    chips.push({ label: COLORS[c]?.label ?? c, clear: { color: toCsv(csv(f.color).filter((x) => x !== c)) } }),
+    chips.push({
+      label: COLORS[c]?.label ?? c,
+      clear: { color: toCsv(csv(f.color).filter((x) => x !== c)) },
+    }),
   );
   csv(f.size).forEach((s) =>
-    chips.push({ label: `Taglia ${s}`, clear: { size: toCsv(csv(f.size).filter((x) => x !== s)) } }),
+    chips.push({
+      label: `Taglia ${s}`,
+      clear: { size: toCsv(csv(f.size).filter((x) => x !== s)) },
+    }),
   );
   if (f.sconto === "1") chips.push({ label: "In promo", clear: { sconto: undefined } });
   if (f.min || f.max)

@@ -22,9 +22,7 @@ export function SizeGuide({
   return (
     <BottomSheet open={open} onClose={onClose} title="Guida alle taglie">
       <div className="p-4">
-        <p className="text-sm text-muted-foreground">
-          Tabella indicativa per {brand}. PLACEHOLDER: dati taglie da caricare dal backend per ogni brand.
-        </p>
+        <p className="text-sm text-muted-foreground">Tabella indicativa per {brand}.</p>
         <table className="mt-4 w-full border border-border text-sm">
           <thead className="bg-surface text-left">
             <tr>

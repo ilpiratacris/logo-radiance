@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { Breadcrumb } from "@/components/site/Breadcrumb";
+import { BrandTile } from "@/components/site/BrandCarousel";
 import { brands, productsByBrand } from "@/lib/catalog";
 
 export const Route = createFileRoute("/brand/")({
@@ -22,6 +24,8 @@ export const Route = createFileRoute("/brand/")({
   },
   component: BrandIndexPage,
 });
+
+const countLabel = (n: number) => `${n} ${n === 1 ? "prodotto" : "prodotti"}`;
 
 function BrandIndexPage() {
   const [q, setQ] = useState("");
@@ -46,61 +50,59 @@ function BrandIndexPage() {
 
   return (
     <SiteLayout>
-      <div className="container-mb pt-6">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Brand</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {brands.length} brand disponibili su MyBrand Italia.
-        </p>
+      <div className="container-mb flex flex-col gap-3 py-4 lg:gap-4 lg:py-5">
+        <Breadcrumb items={[{ label: "Home", to: "/" }, { label: "Brand" }]} />
+        <div className="flex flex-col gap-1.5 lg:gap-2">
+          <h1 className="text-2xl font-semibold leading-8 tracking-tight lg:text-3xl lg:leading-9">
+            Brand
+          </h1>
+          <p className="text-sm leading-5 text-muted-foreground">
+            {brands.length} brand disponibili su MyBrand Italia.
+          </p>
+        </div>
 
-        <div className="mt-4 flex h-12 items-center gap-2 border border-border-strong px-3">
-          <Search className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
+        <label className="search-box h-12 text-base lg:max-w-md">
+          <Search className="h-5 w-5 shrink-0" strokeWidth={1.5} aria-hidden="true" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cerca un brand"
             aria-label="Cerca un brand"
-            className="h-full w-full bg-transparent text-sm outline-none"
           />
-        </div>
+        </label>
       </div>
 
       {!q && (
-        <section className="container-mb mt-8">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.12em]">Brand popolari</h2>
-          <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <section className="container-mb pt-4" aria-labelledby="brand-popolari">
+          <h2 id="brand-popolari" className="label-caps font-display text-sm">
+            Brand in evidenza
+          </h2>
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {featured.map((b) => (
-              <Link key={b.slug} to="/brand/$slug" params={{ slug: b.slug }} className="group block">
-                <img
-                  src={b.image}
-                  alt={b.name}
-                  width={600}
-                  height={400}
-                  loading="lazy"
-                  className="aspect-[3/2] w-full object-cover"
-                />
-                <div className="mt-2 text-xs font-semibold uppercase tracking-[0.08em]">{b.name}</div>
-                <div className="text-[11px] text-muted-foreground">
-                  {productsByBrand(b.slug).length} prodotti
-                </div>
-              </Link>
+              <BrandTile key={b.slug} brand={b} note={countLabel(productsByBrand(b.slug).length)} />
             ))}
           </div>
         </section>
       )}
 
-      <section className="container-mb mt-10 pb-10">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em]">Tutti i brand</h2>
-        <div className="mt-2">
+      <section className="container-mb pb-10 pt-10 lg:pb-14" aria-labelledby="brand-tutti">
+        <h2 id="brand-tutti" className="label-caps font-display text-sm">
+          Tutti i brand
+        </h2>
+        <div className="mt-2 border-t border-border">
           {letters.map(([letter, list]) => (
-            <div key={letter} className="border-b border-border py-3">
-              <div className="sticky top-[100px] bg-background py-1 text-sm font-semibold">{letter}</div>
+            <div
+              key={letter}
+              className="grid gap-x-6 border-b border-border py-3 md:grid-cols-[48px_1fr]"
+            >
+              <div className="py-2 font-display text-lg font-semibold leading-7">{letter}</div>
               <ul className="grid grid-cols-2 md:grid-cols-4">
                 {list.map((b) => (
                   <li key={b.slug}>
                     <Link
                       to="/brand/$slug"
                       params={{ slug: b.slug }}
-                      className="flex h-11 items-center text-sm text-muted-foreground hover:text-foreground"
+                      className="flex h-11 items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {b.name}
                     </Link>
